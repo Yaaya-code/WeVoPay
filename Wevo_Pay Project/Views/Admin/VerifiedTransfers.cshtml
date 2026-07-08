@@ -1,0 +1,65 @@
+﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<h2>Verified Transfers</h2>
+
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Wallet</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.User.FullName
+            </td>
+
+            <td>
+                @item.CompanyWallet.WalletName
+            </td>
+
+            <td>
+                @item.TransferAmount
+            </td>
+
+            <td>
+                @item.Status
+            </td>
+
+            <td>
+                <form asp-action="Complete"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           value="@item.Id" />
+
+                    <button class="btn btn-success">
+                        Complete
+                    </button>
+
+                </form>
+            </td>
+
+        </tr>
+    }
+
+    </tbody>
+
+</table>

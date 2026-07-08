@@ -1,0 +1,29 @@
+﻿@model Wevo_Pay_Project.Models.CompanyWallet
+
+@{
+    Layout = "_AdminLayout";
+}
+
+<h2>Create Wallet</h2>
+
+<form asp-action="Create" method="post">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="WalletName"></label>
+        <input asp-for="WalletName" class="form-control" />
+        <span asp-validation-for="WalletName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WalletNumber"></label>
+        <input asp-for="WalletNumber" class="form-control" />
+        <span asp-validation-for="WalletNumber" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Save
+    </button>
+
+</form>

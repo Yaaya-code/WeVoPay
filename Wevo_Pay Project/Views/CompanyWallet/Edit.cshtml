@@ -1,0 +1,34 @@
+﻿@model Wevo_Pay_Project.Models.CompanyWallet
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Edit Wallet";
+}
+
+<h2>Edit Wallet</h2>
+
+<form asp-action="Edit" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="WalletName"></label>
+        <input asp-for="WalletName" class="form-control" />
+        <span asp-validation-for="WalletName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WalletNumber"></label>
+        <input asp-for="WalletNumber" class="form-control" />
+        <span asp-validation-for="WalletNumber" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-success">
+        Save Changes
+    </button>
+
+</form>

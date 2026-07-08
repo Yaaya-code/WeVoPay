@@ -1,0 +1,49 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Wevo_Pay_Project.Models.SystemSetting
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "System Settings";
+}
+
+<h2>System Settings</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<form asp-action="Index" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FeePercentage"></label>
+        <input asp-for="FeePercentage" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MinTransferAmount"></label>
+        <input asp-for="MinTransferAmount" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MaxTransferAmount"></label>
+        <input asp-for="MaxTransferAmount" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">
+        Save
+    </button>
+
+</form>

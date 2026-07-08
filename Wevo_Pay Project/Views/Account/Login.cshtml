@@ -1,0 +1,42 @@
+﻿@model Wevo_Pay_Project.DTOs.LoginDto
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login</h2>
+
+
+<form asp-action="Login" method="post">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+
+    <div>
+        <label>Email or Username</label>
+
+        <input asp-for="EmailOrUserName"
+               class="form-control" />
+
+        <span asp-validation-for="EmailOrUserName"
+              class="text-danger"></span>
+    </div>
+
+
+    <div>
+        <label>Password</label>
+
+        <input asp-for="Password"
+               type="password"
+               class="form-control" />
+
+        <span asp-validation-for="Password"
+              class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">
+        Login
+    </button>
+
+</form>

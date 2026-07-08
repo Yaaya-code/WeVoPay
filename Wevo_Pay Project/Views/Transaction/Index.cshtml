@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Wevo_Pay_Project.Models.Transaction>
+
+@{
+    ViewData["Title"] = "Transactions";
+    Layout = "_AdminLayout";
+}
+
+<h2>Transactions</h2>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>User</th>
+            <th>Wallet</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@item.Id</td>
+
+                <td>@item.TransferRequest.User.FullName</td>
+
+                <td>@item.TransferRequest.CompanyWallet.WalletName</td>
+
+                <td>@item.Amount</td>
+
+                <td>@item.Status</td>
+
+                <td>@item.CreatedAt</td>
+
+                <td>
+
+                    <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-primary btn-sm">
+
+                        Details
+
+                    </a>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

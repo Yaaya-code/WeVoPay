@@ -1,0 +1,66 @@
+﻿@model Wevo_Pay_Project.Models.Transaction
+
+@{
+    ViewData["Title"] = "Transaction Details";
+    Layout = "_AdminLayout";
+}
+
+<h2>Transaction Details</h2>
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Transaction Id</th>
+        <td>@Model.Id</td>
+    </tr>
+
+    <tr>
+        <th>User</th>
+        <td>@Model.TransferRequest.User.FullName</td>
+    </tr>
+
+    <tr>
+        <th>Email</th>
+        <td>@Model.TransferRequest.User.Email</td>
+    </tr>
+
+    <tr>
+        <th>Wallet</th>
+        <td>@Model.TransferRequest.CompanyWallet.WalletName</td>
+    </tr>
+
+    <tr>
+        <th>Wallet Number</th>
+        <td>@Model.TransferRequest.CompanyWallet.WalletNumber</td>
+    </tr>
+
+    <tr>
+        <th>Amount</th>
+        <td>@Model.Amount</td>
+    </tr>
+
+    <tr>
+        <th>Status</th>
+        <td>@Model.Status</td>
+    </tr>
+
+    <tr>
+        <th>Reference Number</th>
+        <td>@(Model.ReferenceNumber ?? "-")</td>
+    </tr>
+
+    <tr>
+        <th>Created At</th>
+        <td>@Model.CreatedAt</td>
+    </tr>
+
+    <tr>
+        <th>Completed At</th>
+        <td>@(Model.CompletedAt?.ToString() ?? "-")</td>
+    </tr>
+
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">
+    Back
+</a>

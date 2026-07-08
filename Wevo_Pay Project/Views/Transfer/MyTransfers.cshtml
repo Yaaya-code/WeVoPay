@@ -1,0 +1,56 @@
+﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+
+@{
+    ViewData["Title"] = "My Transfers";
+}
+
+<h2>My Transfers</h2>
+
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>Wallet</th>
+            <th>Amount</th>
+            <th>Fee</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.CompanyWallet.WalletName
+                </td>
+
+                <td>
+                    @item.TransferAmount
+                </td>
+
+                <td>
+                    @item.Fee
+                </td>
+
+                <td>
+                    @item.TotalAmount
+                </td>
+
+                <td>
+                    @item.Status
+                </td>
+
+                <td>
+                    @item.CreatedAt
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>

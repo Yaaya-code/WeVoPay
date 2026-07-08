@@ -1,0 +1,71 @@
+﻿@model List<Wevo_Pay_Project.Models.CompanyWallet>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Wallets";
+}
+
+<h2>Company Wallets</h2>
+
+<a asp-action="Create"
+       class="btn btn-primary mb-3">
+    Add New Wallet
+</a>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Number</th>
+            <th>Status</th>
+            <th width="220">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var wallet in Model)
+        {
+            <tr>
+
+                <td>@wallet.WalletName</td>
+
+                <td>@wallet.WalletNumber</td>
+
+                <td>
+                    @(wallet.IsActive ? "Active" : "Inactive")
+                </td>
+
+                <td>
+
+                    <a asp-action="EditWallet"
+                           asp-route-id="@wallet.Id"
+                           class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <form asp-action="ToggleStatus"
+                          method="post"
+                          style="display:inline">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="id"
+                               value="@wallet.Id" />
+
+                        <button class="btn btn-secondary btn-sm">
+                            Toggle
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

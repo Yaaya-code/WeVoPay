@@ -1,0 +1,54 @@
+﻿@model Wevo_Pay_Project.DTOs.AdminDashboardDto
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<hr />
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Total Users</th>
+        <td>@Model.TotalUsers</td>
+    </tr>
+
+    <tr>
+        <th>Total Wallets</th>
+        <td>@Model.TotalWallets</td>
+    </tr>
+
+    <tr>
+        <th>Pending Transfers</th>
+        <td>@Model.PendingTransfers</td>
+    </tr>
+
+    <tr>
+        <th>Verified Transfers</th>
+        <td>@Model.VerifiedTransfers</td>
+    </tr>
+
+    <tr>
+        <th>Completed Transfers</th>
+        <td>@Model.CompletedTransfers</td>
+    </tr>
+
+    <tr>
+        <th>Rejected Transfers</th>
+        <td>@Model.RejectedTransfers</td>
+    </tr>
+
+    <tr>
+        <th>Total Revenue</th>
+        <td>@Model.TotalRevenue</td>
+    </tr>
+
+    <tr>
+        <th>Today's Revenue</th>
+        <td>@Model.TodayRevenue</td>
+    </tr>
+
+</table>

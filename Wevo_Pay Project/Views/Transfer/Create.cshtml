@@ -1,0 +1,90 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Wevo_Pay_Project.DTOs.CreateTransferDto
+
+@{
+    ViewData["Title"] = "Create Transfer";
+}
+
+
+<h2>Create Transfer</h2>
+
+
+<form asp-action="Create" method="post">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+
+    <div>
+        <label>Choose Wallet</label>
+
+        <select asp-for="CompanyWalletId" class="form-control">
+
+            <option value="">
+                -- Select Wallet --
+            </option>
+
+
+            @foreach (var wallet in ViewBag.Wallets)
+            {
+                <option value="@wallet.Id">
+                    @wallet.WalletName - @wallet.WalletNumber
+                </option>
+            }
+
+        </select>
+
+
+        <span asp-validation-for="CompanyWalletId"
+              class="text-danger"></span>
+
+    </div>
+
+
+
+    <div>
+        <label>InstaPay Address</label>
+
+        <input asp-for="InstaPayAddress"
+               class="form-control" />
+
+
+        <span asp-validation-for="InstaPayAddress"
+              class="text-danger"></span>
+
+    </div>
+
+
+
+    <div>
+        <label>Transfer Amount</label>
+
+        <input asp-for="TransferAmount"
+               class="form-control" />
+
+
+        <span asp-validation-for="TransferAmount"
+              class="text-danger"></span>
+
+    </div>
+
+
+
+    <div>
+        <label>Notes</label>
+
+        <textarea asp-for="Notes"
+                  class="form-control"></textarea>
+
+    </div>
+
+
+
+    <button type="submit" class="btn btn-success">
+        Send Request
+    </button>
+
+</form>
