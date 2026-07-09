@@ -18,6 +18,7 @@ namespace Wevo_Pay_Project.Services
         public async Task<AdminDashboardDto> GetDashboardAsync()
         {
             var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
 
             return new AdminDashboardDto
             {
@@ -44,7 +45,8 @@ namespace Wevo_Pay_Project.Services
                 TodayRevenue = await _context.TransferRequests
                     .Where(t => t.Status == TransferStatus.Completed &&
                                 t.CompletedAt.HasValue &&
-                                t.CompletedAt.Value.Date == today)
+                                t.CompletedAt >= today &&
+                                t.CompletedAt < tomorrow)
                     .SumAsync(t => (decimal?)t.Fee) ?? 0
             };
         }

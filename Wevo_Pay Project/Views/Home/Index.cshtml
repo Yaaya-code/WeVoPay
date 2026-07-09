@@ -3,6 +3,21 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to Wevo Pay</h1>
+
+    @if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        <p>
+            <a asp-controller="Transfer" asp-action="Create" class="btn btn-primary">Create Transfer</a>
+            <a asp-controller="Transfer" asp-action="MyTransfers" class="btn btn-secondary">My Transfers</a>
+        </p>
+    }
+    else
+    {
+        <p>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Register</a>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+        </p>
+    }
+
 </div>

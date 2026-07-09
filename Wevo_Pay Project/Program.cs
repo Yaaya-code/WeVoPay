@@ -58,9 +58,9 @@ namespace Wevo_Pay_Project
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Admin}/{action=Dashboard}/{id?}")
-    .WithStaticAssets();
+            name: "default",
+            pattern: "{controller=Account}/{action=Login}/{id?}")
+            .WithStaticAssets();
 
             app.Run();
         }

@@ -1,0 +1,72 @@
+@model Wevo_Pay_Project.Models.TransferRequest
+
+@{
+    ViewData["Title"] = "Transfer Details";
+}
+
+<h2>Transfer Details</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Id</th>
+        <td>@Model.Id</td>
+    </tr>
+
+    <tr>
+        <th>Wallet</th>
+        <td>@Model.CompanyWallet?.WalletName (@Model.CompanyWallet?.WalletNumber)</td>
+    </tr>
+
+    <tr>
+        <th>Amount</th>
+        <td>@Model.TransferAmount</td>
+    </tr>
+
+    <tr>
+        <th>Fee</th>
+        <td>@Model.Fee</td>
+    </tr>
+
+    <tr>
+        <th>Total</th>
+        <td>@Model.TotalAmount</td>
+    </tr>
+
+    <tr>
+        <th>InstaPay Address</th>
+        <td>@Model.InstaPayAddress</td>
+    </tr>
+
+    <tr>
+        <th>Notes</th>
+        <td>@Model.Notes</td>
+    </tr>
+
+    <tr>
+        <th>Status</th>
+        <td>@Model.Status</td>
+    </tr>
+
+    <tr>
+        <th>Created At</th>
+        <td>@Model.CreatedAt</td>
+    </tr>
+
+    <tr>
+        <th>Verified At</th>
+        <td>@(Model.VerifiedAt?.ToString() ?? "-")</td>
+    </tr>
+
+    <tr>
+        <th>Completed At</th>
+        <td>@(Model.CompletedAt?.ToString() ?? "-")</td>
+    </tr>
+
+    <tr>
+        <th>Rejected At</th>
+        <td>@(Model.RejectedAt?.ToString() ?? "-")</td>
+    </tr>
+
+</table>
+
+<a asp-action="MyTransfers" class="btn btn-secondary">Back</a>
