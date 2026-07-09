@@ -1,0 +1,235 @@
+﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Completed Transfers";
+}
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="fw-bold">
+        Completed Transfers
+    </h2>
+
+</div>
+
+
+
+<form method="get" asp-action="CompletedTransfers" class="mb-4">
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Search by user, wallet or InstaPay..." />
+
+        </div>
+
+
+        <div class="col-md-2">
+
+            <button class="btn btn-primary w-100">
+
+                <i class="bi bi-search"></i>
+                Search
+
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+
+
+<div class="card shadow-sm border-0 rounded-4">
+
+    <div class="card-body">
+
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                No completed transfers found.
+            </div>
+        }
+        else
+        {
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>User</th>
+                            <th>Wallet</th>
+                            <th>Amount</th>
+                            <th>Fee</th>
+                            <th>Total</th>
+                            <th>Completed At</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+
+
+                                <td>
+                                    @item.User?.FullName
+                                </td>
+
+
+                                <td>
+                                    @item.CompanyWallet?.WalletName
+                                </td>
+
+
+                                <td>
+                                    @item.TransferAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.Fee.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.TotalAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @(item.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")
+                                </td>
+
+
+                                <td>
+
+                                    <a asp-controller="Admin"
+                                           asp-action="TransferDetails"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-primary">
+
+                                        Details
+
+                                    </a>
+
+                                </td>
+
+
+                            </tr>
+
+                        }
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        }
+
+
+    </div>
+
+</div>
+
+
+
+
+
+@if (ViewBag.TotalPages > 1)
+{
+
+    <nav class="mt-4">
+
+        <ul class="pagination justify-content-center">
+
+
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                           asp-action="CompletedTransfers"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.Search">
+
+                        Previous
+
+                    </a>
+
+                </li>
+            }
+
+
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+
+                    <a class="page-link"
+                           asp-action="CompletedTransfers"
+                           asp-route-page="@i"
+                           asp-route-search="@ViewBag.Search">
+
+                        @i
+
+                    </a>
+
+                </li>
+
+            }
+
+
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                           asp-action="CompletedTransfers"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.Search">
+
+                        Next
+
+                    </a>
+
+                </li>
+            }
+
+
+        </ul>
+
+    </nav>
+
+}

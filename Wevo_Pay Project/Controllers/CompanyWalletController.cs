@@ -16,11 +16,24 @@ namespace Wevo_Pay_Project.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string? search,
+    int page = 1)
         {
-            var wallets = await _walletService.GetAllAsync();
+            int pageSize = 10;
 
-            return View(wallets);
+            var result = await _walletService.GetWalletsAsync(
+                search,
+                page,
+                pageSize
+            );
+
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(result.TotalCount / (double)pageSize);
+
+            return View(result.Wallets);
         }
 
         [HttpGet]

@@ -50,28 +50,61 @@
                     </li>
 
                     <li class="nav-item">
+
                         <a class="nav-link text-white"
                                asp-controller="Admin"
                                asp-action="PendingTransfers">
+
+                            <i class="bi bi-hourglass-split"></i>
                             Pending Transfers
+
                         </a>
+
                     </li>
 
+
                     <li class="nav-item">
+
                         <a class="nav-link text-white"
                                asp-controller="Admin"
                                asp-action="VerifiedTransfers">
+
+                            <i class="bi bi-check-circle"></i>
                             Verified Transfers
+
                         </a>
+
                     </li>
 
+
                     <li class="nav-item">
+
                         <a class="nav-link text-white"
-                               asp-controller="Transaction"
-                               asp-action="Index">
-                            Transactions
+                               asp-controller="Admin"
+                               asp-action="CompletedTransfers">
+
+                            <i class="bi bi-check2-all"></i>
+                            Completed Transfers
+
                         </a>
+
                     </li>
+
+
+                    <li class="nav-item">
+
+                        <a class="nav-link text-white"
+                               asp-controller="Admin"
+                               asp-action="RejectedTransfers">
+
+                            <i class="bi bi-x-circle"></i>
+                            Rejected Transfers
+
+                        </a>
+
+                    </li>
+
+
 
                     <li class="nav-item">
                         <a class="nav-link text-white"

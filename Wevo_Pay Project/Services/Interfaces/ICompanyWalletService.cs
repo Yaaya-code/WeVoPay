@@ -4,7 +4,11 @@ namespace Wevo_Pay_Project.Services.Interfaces
 {
     public interface ICompanyWalletService
     {
-        Task<List<CompanyWallet>> GetAllAsync();
+        Task<(List<CompanyWallet> Wallets, int TotalCount)> GetWalletsAsync(
+    string? search,
+    int page,
+    int pageSize
+);
 
         Task<CompanyWallet?> GetByIdAsync(int id);
 
@@ -13,5 +17,9 @@ namespace Wevo_Pay_Project.Services.Interfaces
         Task<bool> UpdateAsync(CompanyWallet wallet);
 
         Task<bool> ToggleStatusAsync(int id);
+
+        Task<List<CompanyWallet>> GetAllAsync();
+
+      
     }
 }

@@ -37,11 +37,31 @@ namespace Wevo_Pay_Project.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> PendingTransfers()
+        public async Task<IActionResult> PendingTransfers(
+    string? search,
+    int page = 1)
         {
-            var transfers = await _transferService.GetPendingTransfersAsync();
+            int pageSize = 10;
 
-            return View(transfers);
+
+            var result = await _transferService.GetPendingTransfersAsync(
+                search,
+                page,
+                pageSize
+            );
+
+
+            ViewBag.Search = search;
+
+            ViewBag.CurrentPage = page;
+
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(
+                    result.TotalCount / (double)pageSize
+                );
+
+
+            return View(result.Transfers);
         }
 
 
@@ -78,7 +98,7 @@ namespace Wevo_Pay_Project.Controllers
                 return NotFound();
 
 
-            return RedirectToAction(nameof(PendingTransfers));
+            return RedirectToAction(nameof(CompletedTransfers));
         }
 
         [HttpPost]
@@ -106,15 +126,35 @@ namespace Wevo_Pay_Project.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> VerifiedTransfers()
+        public async Task<IActionResult> VerifiedTransfers(
+    string? search,
+    int page = 1)
         {
-            var transfers = await _transferService.GetVerifiedTransfersAsync();
+            int pageSize = 10;
 
-            return View(transfers);
+
+            var result = await _transferService.GetVerifiedTransfersAsync(
+                search,
+                page,
+                pageSize
+            );
+
+
+            ViewBag.Search = search;
+
+            ViewBag.CurrentPage = page;
+
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(
+                    result.TotalCount / (double)pageSize
+                );
+
+
+            return View(result.Transfers);
         }
 
-      
-        
+
+
 
         [HttpGet]
         public async Task<IActionResult> Settings()
@@ -144,6 +184,77 @@ namespace Wevo_Pay_Project.Controllers
 
             return RedirectToAction(nameof(Dashboard));
         }
+
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectedTransfers(
+                                                        string? search,
+                                                        int page = 1)
+        {
+            int pageSize = 10;
+
+
+            var result = await _transferService.GetRejectedTransfersAsync(
+                search,
+                page,
+                pageSize
+            );
+
+
+            ViewBag.Search = search;
+
+            ViewBag.CurrentPage = page;
+
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(
+                    result.TotalCount / (double)pageSize
+                );
+
+
+            return View(result.Transfers);
+        }
+
+
+
+
+        public async Task<IActionResult> CompletedTransfers(
+            string? search,
+            int page = 1)
+        {
+            int pageSize = 10;
+
+
+            var result = await _transferService.GetCompletedTransfersAsync(
+                search,
+                page,
+                pageSize
+            );
+
+
+            ViewBag.Search = search;
+
+            ViewBag.CurrentPage = page;
+
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(
+                    result.TotalCount / (double)pageSize
+                );
+
+
+            return View(result.Transfers);
+        }
+
+        public async Task<IActionResult> TransferDetails(int id)
+        {
+            var transfer = await _transferService.GetTransferByIdAsync(id);
+
+            if (transfer == null)
+                return NotFound();
+
+            return View(transfer);
+        }
+
+       
 
     }
 }

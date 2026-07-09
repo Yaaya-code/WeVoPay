@@ -5,50 +5,284 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<h2>Admin Dashboard</h2>
 
-<hr />
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<table class="table table-bordered">
+    <div>
+        <h2 class="fw-bold">
+            Admin Dashboard
+        </h2>
 
-    <tr>
-        <th>Total Users</th>
-        <td>@Model.TotalUsers</td>
-    </tr>
+        <p class="text-muted">
+            Overview of WevoPay system activity.
+        </p>
+    </div>
 
-    <tr>
-        <th>Total Wallets</th>
-        <td>@Model.TotalWallets</td>
-    </tr>
+</div>
 
-    <tr>
-        <th>Pending Transfers</th>
-        <td>@Model.PendingTransfers</td>
-    </tr>
 
-    <tr>
-        <th>Verified Transfers</th>
-        <td>@Model.VerifiedTransfers</td>
-    </tr>
 
-    <tr>
-        <th>Completed Transfers</th>
-        <td>@Model.CompletedTransfers</td>
-    </tr>
+<div class="row g-4">
 
-    <tr>
-        <th>Rejected Transfers</th>
-        <td>@Model.RejectedTransfers</td>
-    </tr>
 
-    <tr>
-        <th>Total Revenue</th>
-        <td>@Model.TotalRevenue</td>
-    </tr>
+    <div class="col-lg-3 col-md-4">
 
-    <tr>
-        <th>Today's Revenue</th>
-        <td>@Model.TodayRevenue</td>
-    </tr>
+        <div class="card shadow-sm border-0 rounded-4">
 
-</table>
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Total Users
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.TotalUsers
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-people fs-1 text-primary"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-lg-3 col-md-4">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Total Wallets
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.TotalWallets
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-wallet2 fs-1 text-success"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-lg-3 col-md-4">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Pending Transfers
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.PendingTransfers
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-clock-history fs-1 text-warning"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-lg-3 col-md-4">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Verified Transfers
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.VerifiedTransfers
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-patch-check fs-1 text-info"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-lg-3 col-md-4">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Completed Transfers
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.CompletedTransfers
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-check-circle fs-1 text-success"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-lg-3 col-md-4">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+                            Rejected Transfers
+                        </h6>
+
+                        <h2 class="fw-bold mb-0">
+                            @Model.RejectedTransfers
+                        </h2>
+
+                    </div>
+
+
+                    <i class="bi bi-x-circle fs-1 text-danger"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<div class="row g-4 mt-2">
+
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Total Revenue
+                </h6>
+
+
+                <h2 class="fw-bold">
+                    @Model.TotalRevenue.ToString("N2") EGP
+                </h2>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Today's Revenue
+                </h6>
+
+
+                <h2 class="fw-bold">
+                    @Model.TodayRevenue.ToString("N2") EGP
+                </h2>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>

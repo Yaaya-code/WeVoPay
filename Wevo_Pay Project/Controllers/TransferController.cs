@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Wevo_Pay_Project.DTOs;
+using Wevo_Pay_Project.Enums;
 using Wevo_Pay_Project.Services.Interfaces;
 
 namespace Wevo_Pay_Project.Controllers
@@ -50,9 +51,12 @@ namespace Wevo_Pay_Project.Controllers
                     User.FindFirstValue(ClaimTypes.NameIdentifier)!
                 );
 
-                await _transferService.CreateTransferAsync(userId, dto);
+                var transfer = await _transferService.CreateTransferAsync(userId, dto);
 
-                return RedirectToAction(nameof(MyTransfers));
+                return RedirectToAction(
+                    "Success",
+                    new { id = transfer.Id }
+                );
             }
             catch (Exception ex)
             {
@@ -65,19 +69,38 @@ namespace Wevo_Pay_Project.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MyTransfers()
+        public async Task<IActionResult> MyTransfers(
+                                                    string search = "",
+                                                    TransferStatus? status = null,
+                                                    int page = 1)
         {
             int userId = int.Parse(
                 User.FindFirstValue(ClaimTypes.NameIdentifier)!
             );
 
+            const int pageSize = 10;
 
-            var transfers = await _transferService
-                .GetUserTransfersAsync(userId);
+            var transfers = await _transferService.GetUserTransfersAsync(
+                                                                            userId,
+                                                                            search,
+                                                                            status,
+                                                                            page,
+                                                                            pageSize);
 
+            var totalCount = await _transferService.GetUserTransfersCountAsync(
+                                                                                userId,
+                                                                                search,
+                                                                                status);
+
+            ViewBag.Search = search;
+            ViewBag.Status = status;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             return View(transfers);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
@@ -101,6 +124,25 @@ namespace Wevo_Pay_Project.Controllers
             ViewBag.Wallets = wallets
                 .Where(w => w.IsActive)
                 .ToList();
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Success(int id)
+        {
+            int userId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
+            var transfer = await _transferService
+                .GetUserTransferByIdAsync(id, userId);
+
+
+            if (transfer == null)
+                return NotFound();
+
+
+            return View(transfer);
         }
 
 

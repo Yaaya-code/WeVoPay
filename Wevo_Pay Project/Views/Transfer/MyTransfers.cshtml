@@ -4,56 +4,236 @@
     ViewData["Title"] = "My Transfers";
 }
 
-<h2>My Transfers</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<table class="table">
+    <div>
+        <h2 class="fw-bold mb-1">My Transfers</h2>
+        <p class="text-muted mb-0">
+            View and manage all your transfer requests.
+        </p>
+    </div>
 
-    <thead>
-        <tr>
-            <th>Wallet</th>
-            <th>Amount</th>
-            <th>Fee</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Date</th>
-        </tr>
-    </thead>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i>
+        New Transfer
+    </a>
 
+</div>
 
-    <tbody>
+<form method="get" class="card shadow-sm border-0 mb-4">
 
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @item.CompanyWallet.WalletName
-                </td>
+    <div class="card-body">
 
-                <td>
-                    @item.TransferAmount
-                </td>
+        <div class="row g-3">
 
-                <td>
-                    @item.Fee
-                </td>
+            <div class="col-md-5">
 
-                <td>
-                    @item.TotalAmount
-                </td>
+                <input type="text"
+                       class="form-control"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Search by Wallet or InstaPay..." />
 
-                <td>
-                    @item.Status
-                </td>
+            </div>
 
-                <td>
-                    @item.CreatedAt
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Details</a>
-                </td>
-            </tr>
-        }
+            <div class="col-md-3">
 
-    </tbody>
+                <select name="status" class="form-select">
 
-</table>
+                    <option value="">All Status</option>
+
+                    @foreach (var s in Enum.GetValues<Wevo_Pay_Project.Enums.TransferStatus>())
+                    {
+                        if (ViewBag.Status != null && ViewBag.Status.Equals(s))
+                        {
+                            <option value="@s" selected>@s</option>
+                        }
+                        else
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+            <div class="col-md-2">
+
+                <button class="btn btn-primary w-100">
+
+                    <i class="bi bi-search"></i>
+
+                    Search
+
+                </button>
+
+            </div>
+
+            <div class="col-md-2">
+
+                <a asp-action="MyTransfers"
+                       class="btn btn-outline-secondary w-100">
+
+                    Reset
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</form>
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-body">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>Wallet</th>
+
+                    <th>Amount</th>
+
+                    <th>Fee</th>
+
+                    <th>Total</th>
+
+                    <th>Status</th>
+
+                    <th>Date</th>
+
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @item.CompanyWallet.WalletName
+                            </td>
+
+                            <td>
+                                @item.TransferAmount.ToString("N2") EGP
+                            </td>
+
+                            <td>
+                                @item.Fee.ToString("N2") EGP
+                            </td>
+
+                            <td class="fw-bold">
+                                @item.TotalAmount.ToString("N2") EGP
+                            </td>
+
+                            <td>
+
+                                @switch (item.Status)
+                                {
+                                    case Wevo_Pay_Project.Enums.TransferStatus.Pending:
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        break;
+
+                                    case Wevo_Pay_Project.Enums.TransferStatus.Verified:
+                                        <span class="badge bg-info">Verified</span>
+                                        break;
+
+                                    case Wevo_Pay_Project.Enums.TransferStatus.Completed:
+                                        <span class="badge bg-success">Completed</span>
+                                        break;
+
+                                    default:
+                                        <span class="badge bg-danger">Rejected</span>
+                                        break;
+                                }
+
+                            </td>
+
+                            <td>
+                                @item.CreatedAt.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+
+                                <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-eye"></i>
+
+                                    Details
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="7" class="text-center py-5">
+
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+
+                            <p class="mt-3 text-muted">
+
+                                No transfers found.
+
+                            </p>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-4">
+
+        <ul class="pagination justify-content-center">
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(ViewBag.Page == i ? "active" : "")">
+
+                    <a class="page-link"
+                           asp-action="MyTransfers"
+                           asp-route-page="@i"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-status="@ViewBag.Status">
+
+                        @i
+
+                    </a>
+
+                </li>
+            }
+
+        </ul>
+
+    </nav>
+}

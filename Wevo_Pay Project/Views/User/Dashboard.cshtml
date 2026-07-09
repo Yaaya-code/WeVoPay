@@ -1,5 +1,283 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Wevo_Pay_Project.DTOs.UserDashboardDto
+
 @{
+    ViewData["Title"] = "Dashboard";
 }
+
+<div class="hero">
+
+    <div class="row align-items-center">
+
+        <div class="col-lg-8">
+
+            <span class="badge bg-light text-primary px-3 py-2 mb-3">
+                Welcome to WevoPay
+            </span>
+
+            <h1 class="display-5 fw-bold mb-3">
+                Welcome Back,
+                @User.Identity?.Name 👋
+            </h1>
+
+            <p class="lead text-white-50 mb-4">
+                Send and manage your transfers securely with WevoPay.
+            </p>
+
+            <a asp-controller="Transfer"
+                   asp-action="Create"
+                   class="btn btn-light btn-lg px-4">
+
+                <i class="bi bi-plus-circle"></i>
+
+                New Transfer
+
+            </a>
+
+        </div>
+
+        <div class="col-lg-4 text-center">
+
+            <i class="bi bi-wallet2"
+               style="font-size:180px;color:white;opacity:.15;"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-4 g-4">
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="stats-card">
+
+            <div class="stats-icon bg-orange">
+                <i class="bi bi-clock-history"></i>
+            </div>
+
+            <div class="stats-title">
+                Pending
+            </div>
+
+            <div class="stats-number">
+                @Model.PendingTransfers
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="stats-card">
+
+            <div class="stats-icon bg-green">
+                <i class="bi bi-check-circle"></i>
+            </div>
+
+            <div class="stats-title">
+                Completed
+            </div>
+
+            <div class="stats-number">
+                @Model.CompletedTransfers
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="stats-card">
+
+            <div class="stats-icon bg-blue">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+
+            <div class="stats-title">
+                Total Amount
+            </div>
+
+            <div class="stats-number">
+                @Model.TotalAmount.ToString("N2") EGP
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="stats-card">
+
+            <div class="stats-icon bg-red">
+                <i class="bi bi-arrow-left-right"></i>
+            </div>
+
+            <div class="stats-title">
+                Transfers
+            </div>
+
+            <div class="stats-number">
+                @Model.TotalTransfers
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-5">
+
+    <div class="col-lg-8">
+
+        <div class="wevo-card">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="fw-bold">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Recent Transfers
+
+                </h4>
+
+                <a asp-controller="Transfer"
+                       asp-action="MyTransfers"
+                       class="btn btn-outline-primary">
+
+                    View All
+
+                </a>
+
+            </div>
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Wallet</th>
+
+                        <th>Amount</th>
+
+                        <th>Status</th>
+
+                        <th></th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.RecentTransfers.Any())
+                    {
+                        @foreach (var item in Model.RecentTransfers)
+                        {
+                            <tr>
+
+                                <td>@item.CompanyWallet.WalletName</td>
+
+                                <td>@item.TransferAmount.ToString("N2") EGP</td>
+
+                                <td>
+
+                                    @switch (item.Status)
+                                    {
+                                        case Wevo_Pay_Project.Enums.TransferStatus.Pending:
+                                            <span class="badge bg-warning">Pending</span>
+                                            break;
+
+                                        case Wevo_Pay_Project.Enums.TransferStatus.Completed:
+                                            <span class="badge bg-success">Completed</span>
+                                            break;
+
+                                        case Wevo_Pay_Project.Enums.TransferStatus.Verified:
+                                            <span class="badge bg-info">Verified</span>
+                                            break;
+
+                                        default:
+                                            <span class="badge bg-danger">Rejected</span>
+                                            break;
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <a asp-controller="Transfer"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                        Details
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="4" class="text-center py-5 text-muted">
+
+                                No transfers found.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="wevo-card">
+
+            <h4 class="fw-bold mb-4">
+
+                Quick Actions
+
+            </h4>
+
+            <a asp-controller="Transfer"
+                   asp-action="Create"
+                   class="btn btn-primary w-100 mb-3">
+
+                <i class="bi bi-send"></i>
+
+                Create Transfer
+
+            </a>
+
+            <a asp-controller="Transfer"
+                   asp-action="MyTransfers"
+                   class="btn btn-outline-primary w-100 mb-3">
+
+                <i class="bi bi-clock-history"></i>
+
+                My Transfers
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

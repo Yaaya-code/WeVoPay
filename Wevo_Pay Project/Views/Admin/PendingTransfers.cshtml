@@ -5,100 +5,540 @@
     ViewData["Title"] = "Pending Transfers";
 }
 
-<h2>Pending Transfers</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="fw-bold">
+        Pending Transfers
+    </h2>
+
+</div>
+
+<form method="get" asp-action="PendingTransfers" class="mb-4">
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Search by user, wallet or InstaPay..." />
+
+        </div>
 
 
-<table class="table">
+        <div class="col-md-2">
 
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Wallet</th>
-            <th>Amount</th>
-            <th>Fee</th>
-            <th>Total</th>
-            <th>InstaPay</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+            <button class="btn btn-primary w-100">
+
+                <i class="bi bi-search"></i>
+                Search
+
+            </button>
+
+        </div>
 
 
-    <tbody>
+    </div>
 
-        @foreach (var item in Model)
+</form>
+
+
+<div class="card shadow-sm border-0 rounded-4">
+
+    <div class="card-body">
+
+
+        @if (!Model.Any())
         {
-            <tr>
+            <div class="alert alert-info">
+                No pending transfers found.
+            </div>
+        }
+        else
+        {
 
-                <td>
-                    @item.User.FullName
-                </td>
+            <div class="table-responsive">
 
-
-                <td>
-                    @item.CompanyWallet.WalletName
-                </td>
-
-
-                <td>
-                    @item.TransferAmount
-                </td>
+                <table class="table table-hover align-middle">
 
 
-                <td>
-                    @item.Fee
-                </td>
+                    <thead>
+
+                        <tr>
+                            <th>User</th>
+                            <th>Wallet</th>
+                            <th>Amount</th>
+                            <th>Fee</th>
+                            <th>Total</th>
+                            <th>InstaPay</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
 
 
-                <td>
-                    @item.TotalAmount
-                </td>
+                    <tbody>
 
 
-                <td>
-                    @item.InstaPayAddress
-                </td>
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+
+                                <td>
+                                    @item.User?.FullName
+                                </td>
 
 
-                <td>
+                                <td>
+                                    @item.CompanyWallet?.WalletName
+                                </td>
+
+
+                                <td>
+                                    @item.TransferAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.Fee.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.TotalAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.InstaPayAddress
+                                </td>
+
+
+                                <td>
+                                    @item.CreatedAt.ToString("dd/MM/yyyy")
+                                </td>
+
+
+                                <td>
+
+
+                                    <a asp-controller="Admin"
+                                           asp-action="TransferDetails"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-primary mb-1">
+
+                                        Details
+
+                                    </a>
+
+
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-success mb-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#verifyModal-@item.Id">
+
+                                        Verify
+
+                                    </button>
+
+
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger mb-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal-@item.Id">
+
+                                        Reject
+
+                                    </button>
+
+
+                                </td>
+
+
+                            </tr>
+
+                        }
+
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <nav class="mt-4">
+
+                                <ul class="pagination justify-content-center">
+
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+
+                                            <a class="page-link"
+                                                   asp-action="PendingTransfers"
+                                                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                                   asp-route-search="@ViewBag.Search">
+
+                                                Previous
+
+                                            </a>
+
+                                        </li>
+                                    }
+
+
+
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+
+                                            <a class="page-link"
+                                                   asp-action="PendingTransfers"
+                                                   asp-route-page="@i"
+                                                   asp-route-search="@ViewBag.Search">
+
+                                                @i
+
+                                            </a>
+
+                                        </li>
+                                    }
+
+
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+
+                                            <a class="page-link"
+                                                   asp-action="PendingTransfers"
+                                                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                                   asp-route-search="@ViewBag.Search">
+
+                                                Next
+
+                                            </a>
+
+                                        </li>
+                                    }
+
+
+                                </ul>
+
+                            </nav>
+                        }
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+        }
+
+
+    </div>
+
+</div>
+
+
+
+
+
+@foreach (var item in Model)
+{
+
+
+    <!-- Verify Modal -->
+
+    <div class="modal fade"
+         id="verifyModal-@item.Id"
+         tabindex="-1">
+
+
+        <div class="modal-dialog modal-dialog-centered">
+
+
+            <div class="modal-content rounded-4 shadow">
+
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title fw-bold text-success">
+
+                        Confirm Verification
+
+                    </h5>
+
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="modal-body">
+
+
+                    <div class="card border-0 bg-light rounded-4">
+
+                        <div class="card-body">
+
+
+                            <h6 class="fw-bold mb-3">
+                                Transfer Information
+                            </h6>
+
+
+                            <p>
+                                <strong>User:</strong>
+                                @item.User?.FullName
+                            </p>
+
+
+                            <p>
+                                <strong>Wallet:</strong>
+                                @item.CompanyWallet?.WalletName
+                            </p>
+
+
+                            <p>
+                                <strong>Wallet Number:</strong>
+                                @item.CompanyWallet?.WalletNumber
+                            </p>
+
+
+                            <p>
+                                <strong>Amount:</strong>
+                                @item.TransferAmount.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>Fee:</strong>
+                                @item.Fee.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>Total:</strong>
+                                @item.TotalAmount.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>InstaPay:</strong>
+                                @item.InstaPayAddress
+                            </p>
+
+
+                            <p>
+                                <strong>Created:</strong>
+                                @item.CreatedAt
+                            </p>
+
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="modal-footer">
+
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+
 
                     <form asp-action="Verify"
-                          method="post"
-                          style="display:inline">
+                          method="post">
+
 
                         @Html.AntiForgeryToken()
+
 
                         <input type="hidden"
                                name="id"
                                value="@item.Id" />
 
-                        <button class="btn btn-warning">
-                            Verify
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            Confirm Verify
+
                         </button>
 
+
                     </form>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+    <!-- Reject Modal -->
+
+
+    <div class="modal fade"
+         id="rejectModal-@item.Id"
+         tabindex="-1">
+
+
+        <div class="modal-dialog modal-dialog-centered">
+
+
+            <div class="modal-content rounded-4 shadow">
+
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title fw-bold text-danger">
+
+                        Confirm Rejection
+
+                    </h5>
+
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="modal-body">
+
+
+                    <div class="card border-0 bg-light rounded-4">
+
+                        <div class="card-body">
+
+
+                            <h6 class="fw-bold mb-3">
+                                Transfer Information
+                            </h6>
+
+
+                            <p>
+                                <strong>User:</strong>
+                                @item.User?.FullName
+                            </p>
+
+
+                            <p>
+                                <strong>Wallet:</strong>
+                                @item.CompanyWallet?.WalletName
+                            </p>
+
+
+                            <p>
+                                <strong>Total:</strong>
+                                @item.TotalAmount.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>InstaPay:</strong>
+                                @item.InstaPayAddress
+                            </p>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="alert alert-warning mt-3">
+
+                        Are you sure you want to reject this transfer?
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="modal-footer">
+
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
 
 
                     <form asp-action="Reject"
-                          method="post"
-                          style="display:inline">
+                          method="post">
+
 
                         @Html.AntiForgeryToken()
+
 
                         <input type="hidden"
                                name="id"
                                value="@item.Id" />
 
-                        <button class="btn btn-danger">
-                            Reject
+
+                        <button type="submit"
+                                class="btn btn-danger">
+
+                            Confirm Reject
+
                         </button>
+
 
                     </form>
 
-                </td>
 
-            </tr>
-        }
+                </div>
 
-    </tbody>
 
-</table>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+}

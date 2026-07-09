@@ -1,34 +1,24 @@
-﻿@model List<Wevo_Pay_Project.Models.CompanyWallet>
+﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
 
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Wallets";
+    ViewData["Title"] = "Rejected Transfers";
 }
 
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
     <h2 class="fw-bold">
-        Company Wallets
+        Rejected Transfers
     </h2>
-
-
-    <a asp-action="Create"
-           class="btn btn-primary">
-
-        Add New Wallet
-
-    </a>
 
 </div>
 
 
 
-
-<form method="get" asp-action="Index" class="mb-4">
+<form method="get" asp-action="RejectedTransfers" class="mb-4">
 
     <div class="row">
-
 
         <div class="col-md-6">
 
@@ -36,10 +26,9 @@
                    name="search"
                    value="@ViewBag.Search"
                    class="form-control"
-                   placeholder="Search by wallet name or number..." />
+                   placeholder="Search by user, wallet or InstaPay..." />
 
         </div>
-
 
 
         <div class="col-md-2">
@@ -53,11 +42,9 @@
 
         </div>
 
-
     </div>
 
 </form>
-
 
 
 
@@ -70,17 +57,13 @@
         @if (!Model.Any())
         {
             <div class="alert alert-info">
-
-                No wallets found.
-
+                No rejected transfers found.
             </div>
         }
         else
         {
 
-
             <div class="table-responsive">
-
 
                 <table class="table table-hover align-middle">
 
@@ -89,11 +72,15 @@
 
                         <tr>
 
-                            <th>Name</th>
-                            <th>Number</th>
+                            <th>User</th>
+                            <th>Wallet</th>
+                            <th>Amount</th>
+                            <th>Fee</th>
+                            <th>Total</th>
+                            <th>InstaPay</th>
                             <th>Status</th>
-                            <th>Created At</th>
-                            <th width="220">Actions</th>
+                            <th>Rejected At</th>
+                            <th>Action</th>
 
                         </tr>
 
@@ -104,94 +91,70 @@
                     <tbody>
 
 
-                        @foreach (var wallet in Model)
+                        @foreach (var item in Model)
                         {
 
                             <tr>
 
 
                                 <td>
-                                    @wallet.WalletName
+                                    @(item.User?.FullName ?? "-")
                                 </td>
 
 
                                 <td>
-                                    @wallet.WalletNumber
+                                    @(item.CompanyWallet?.WalletName ?? "-")
+                                </td>
+
+
+                                <td>
+                                    @item.TransferAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.Fee.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.TotalAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @(item.InstaPayAddress ?? "-")
                                 </td>
 
 
                                 <td>
 
-                                    @if (wallet.IsActive)
-                                    {
-                                        <span class="badge bg-success">
-                                            Active
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">
-                                            Inactive
-                                        </span>
-                                    }
+                                    <span class="badge bg-danger">
+
+                                        @item.Status
+
+                                    </span>
 
                                 </td>
 
 
-
                                 <td>
-                                    @wallet.CreatedAt.ToString("dd/MM/yyyy")
+
+                                    @(item.RejectedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")
+
                                 </td>
 
 
-
                                 <td>
 
+                                    <a asp-controller="Admin"
+                                           asp-action="TransferDetails"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-primary">
 
-                                    <a asp-action="Edit"
-                                           asp-route-id="@wallet.Id"
-                                           class="btn btn-warning btn-sm">
-
-                                        Edit
+                                        Details
 
                                     </a>
-
-
-
-                                    <form asp-action="ToggleStatus"
-                                          method="post"
-                                          style="display:inline">
-
-
-                                        @Html.AntiForgeryToken()
-
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@wallet.Id" />
-
-
-
-                                        @if (wallet.IsActive)
-                                        {
-                                            <button class="btn btn-danger btn-sm">
-
-                                                Disable
-
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-success btn-sm">
-
-                                                Enable
-
-                                            </button>
-                                        }
-
-
-                                    </form>
-
 
                                 </td>
 
@@ -230,11 +193,10 @@
 
             @if (ViewBag.CurrentPage > 1)
             {
-
                 <li class="page-item">
 
                     <a class="page-link"
-                           asp-action="Index"
+                           asp-action="RejectedTransfers"
                            asp-route-page="@(ViewBag.CurrentPage - 1)"
                            asp-route-search="@ViewBag.Search">
 
@@ -243,9 +205,7 @@
                     </a>
 
                 </li>
-
             }
-
 
 
 
@@ -254,9 +214,8 @@
 
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
 
-
                     <a class="page-link"
-                           asp-action="Index"
+                           asp-action="RejectedTransfers"
                            asp-route-page="@i"
                            asp-route-search="@ViewBag.Search">
 
@@ -264,22 +223,18 @@
 
                     </a>
 
-
                 </li>
 
             }
 
 
 
-
-
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
-
                 <li class="page-item">
 
                     <a class="page-link"
-                           asp-action="Index"
+                           asp-action="RejectedTransfers"
                            asp-route-page="@(ViewBag.CurrentPage + 1)"
                            asp-route-search="@ViewBag.Search">
 
@@ -288,7 +243,6 @@
                     </a>
 
                 </li>
-
             }
 
 

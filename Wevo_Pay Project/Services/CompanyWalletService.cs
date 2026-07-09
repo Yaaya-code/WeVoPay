@@ -15,11 +15,36 @@ namespace Wevo_Pay_Project.Services
         }
 
 
-        public async Task<List<CompanyWallet>> GetAllAsync()
+        public async Task<(List<CompanyWallet> Wallets, int TotalCount)> GetWalletsAsync(
+    string? search,
+    int page,
+    int pageSize)
         {
-            return await _context.CompanyWallets
+            var query = _context.CompanyWallets
+                .AsQueryable();
+
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(w =>
+                    w.WalletName.Contains(search) ||
+                    w.WalletNumber.Contains(search));
+            }
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var wallets = await query
                 .OrderByDescending(w => w.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+
+            return (wallets, totalCount);
         }
 
 
@@ -95,5 +120,14 @@ namespace Wevo_Pay_Project.Services
 
             return true;
         }
+
+        public async Task<List<CompanyWallet>> GetAllAsync()
+        {
+            return await _context.CompanyWallets
+                .OrderByDescending(w => w.CreatedAt)
+                .ToListAsync();
+        }
+
+
     }
 }

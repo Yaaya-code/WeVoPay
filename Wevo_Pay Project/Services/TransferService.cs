@@ -27,13 +27,58 @@ namespace Wevo_Pay_Project.Services
         }
 
 
-        public async Task<List<TransferRequest>> GetUserTransfersAsync(int userId)
+        public async Task<List<TransferRequest>> GetUserTransfersAsync(
+                                                                        int userId,
+                                                                        string search,
+                                                                        TransferStatus? status,
+                                                                        int page,
+                                                                        int pageSize)
         {
-            return await _context.TransferRequests
+            var query = _context.TransferRequests
                 .Include(t => t.CompanyWallet)
-                .Where(t => t.UserId == userId)
+                .Where(t => t.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(t => t.Status == status.Value);
+            }
+
+            return await query
                 .OrderByDescending(t => t.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetUserTransfersCountAsync(
+                                                        int userId,
+                                                        string search,
+                                                        TransferStatus? status)
+        {
+            var query = _context.TransferRequests
+                .Include(t => t.CompanyWallet)
+                .Where(t => t.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(t => t.Status == status.Value);
+            }
+
+            return await query.CountAsync();
         }
 
 
@@ -75,12 +120,23 @@ namespace Wevo_Pay_Project.Services
                 throw new Exception("System settings not found.");
 
 
+            if (string.IsNullOrWhiteSpace(dto.InstaPayAddress))
+                throw new Exception("InstaPay address is required.");
+
+
+            dto.InstaPayAddress = dto.InstaPayAddress.Trim();
+
+
+            if (!string.IsNullOrWhiteSpace(dto.Notes))
+                dto.Notes = dto.Notes.Trim();
+
+
 
             if (dto.TransferAmount < settings.MinTransferAmount ||
                 dto.TransferAmount > settings.MaxTransferAmount)
             {
                 throw new Exception(
-                    "Transfer amount is outside the allowed limits."
+                    $"Transfer amount must be between {settings.MinTransferAmount} and {settings.MaxTransferAmount}."
                 );
             }
 
@@ -98,7 +154,8 @@ namespace Wevo_Pay_Project.Services
             var transfer = new TransferRequest
             {
                 UserId = userId,
-                CompanyWalletId = dto.CompanyWalletId,
+
+                CompanyWalletId = wallet.Id,
 
                 InstaPayAddress = dto.InstaPayAddress,
 
@@ -117,10 +174,7 @@ namespace Wevo_Pay_Project.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-
-
             _context.TransferRequests.Add(transfer);
-
 
             await _context.SaveChangesAsync();
 
@@ -236,28 +290,145 @@ namespace Wevo_Pay_Project.Services
         }
 
 
-        public async Task<List<TransferRequest>> GetPendingTransfersAsync()
+        public async Task<(List<TransferRequest> Transfers, int TotalCount)> GetPendingTransfersAsync(
+    string? search,
+    int page,
+    int pageSize)
         {
-            return await _context.TransferRequests
-
+            var query = _context.TransferRequests
                 .Include(t => t.User)
-
                 .Include(t => t.CompanyWallet)
+                .Where(t => t.Status == TransferStatus.Pending);
 
-                .Where(t => t.Status == TransferStatus.Pending)
 
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.User.FullName.Contains(search) ||
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var transfers = await query
                 .OrderByDescending(t => t.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+
+            return (transfers, totalCount);
         }
 
-        public async Task<List<TransferRequest>> GetVerifiedTransfersAsync()
+        public async Task<(List<TransferRequest> Transfers, int TotalCount)> GetVerifiedTransfersAsync(
+    string? search,
+    int page,
+    int pageSize)
+        {
+            var query = _context.TransferRequests
+                .Include(t => t.User)
+                .Include(t => t.CompanyWallet)
+                .Where(t => t.Status == TransferStatus.Verified);
+
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.User.FullName.Contains(search) ||
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var transfers = await query
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+
+            return (transfers, totalCount);
+        }
+
+
+        public async Task<(List<TransferRequest> Transfers, int TotalCount)> GetRejectedTransfersAsync(
+    string? search,
+    int page,
+    int pageSize)
+        {
+            var query = _context.TransferRequests
+                .Include(t => t.User)
+                .Include(t => t.CompanyWallet)
+                .Where(t => t.Status == TransferStatus.Rejected);
+
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.User.FullName.Contains(search) ||
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var transfers = await query
+                .OrderByDescending(t => t.RejectedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+
+            return (transfers, totalCount);
+        }
+
+        public async Task<TransferRequest?> GetTransferByIdAsync(int id)
         {
             return await _context.TransferRequests
                 .Include(t => t.User)
                 .Include(t => t.CompanyWallet)
-                .Where(t => t.Status == TransferStatus.Verified)
-                .OrderByDescending(t => t.CreatedAt)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<(List<TransferRequest> Transfers, int TotalCount)> GetCompletedTransfersAsync(
+    string? search,
+    int page,
+    int pageSize)
+        {
+            var query = _context.TransferRequests
+                .Include(t => t.User)
+                .Include(t => t.CompanyWallet)
+                .Where(t => t.Status == TransferStatus.Completed);
+
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(t =>
+                    t.User.FullName.Contains(search) ||
+                    t.CompanyWallet.WalletName.Contains(search) ||
+                    t.InstaPayAddress.Contains(search));
+            }
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var transfers = await query
+                .OrderByDescending(t => t.CompletedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+
+            return (transfers, totalCount);
         }
 
 

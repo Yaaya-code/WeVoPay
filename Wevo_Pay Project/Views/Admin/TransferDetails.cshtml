@@ -1,0 +1,214 @@
+﻿@model Wevo_Pay_Project.Models.TransferRequest
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Transfer Details";
+}
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="fw-bold">
+            Transfer Details
+        </h2>
+
+        <p class="text-muted">
+            Full information about this transfer request.
+        </p>
+    </div>
+
+</div>
+
+
+
+<div class="card shadow-sm border-0 rounded-4">
+
+    <div class="card-body">
+
+
+        <h5 class="fw-bold mb-3">
+            Transfer Information
+        </h5>
+
+
+        <table class="table table-bordered">
+
+
+            <tr>
+                <th>Transfer ID</th>
+                <td>#@Model.Id</td>
+            </tr>
+
+
+            <tr>
+                <th>Status</th>
+                <td>
+
+                    @if (Model.Status.ToString() == "Completed")
+                    {
+                        <span class="badge bg-success">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (Model.Status.ToString() == "Rejected")
+                    {
+                        <span class="badge bg-danger">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (Model.Status.ToString() == "Verified")
+                    {
+                        <span class="badge bg-info text-dark">
+                            @Model.Status
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">
+                            @Model.Status
+                        </span>
+                    }
+
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Amount</th>
+                <td>
+                    @Model.TransferAmount.ToString("N2") EGP
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Fee</th>
+                <td>
+                    @Model.Fee.ToString("N2") EGP
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Total Amount</th>
+                <td>
+                    @Model.TotalAmount.ToString("N2") EGP
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Wallet</th>
+                <td>
+                    @Model.CompanyWallet?.WalletName
+                    -
+                    @Model.CompanyWallet?.WalletNumber
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>InstaPay Address</th>
+                <td>
+                    @Model.InstaPayAddress
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Notes</th>
+                <td>
+                    @(Model.Notes ?? "-")
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Created At</th>
+                <td>
+                    @Model.CreatedAt
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Verified At</th>
+                <td>
+                    @(Model.VerifiedAt?.ToString() ?? "-")
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Completed At</th>
+                <td>
+                    @(Model.CompletedAt?.ToString() ?? "-")
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Rejected At</th>
+                <td>
+                    @(Model.RejectedAt?.ToString() ?? "-")
+                </td>
+            </tr>
+
+
+        </table>
+
+
+
+        <hr />
+
+
+        <h5 class="fw-bold mb-3">
+            User Information
+        </h5>
+
+
+        <table class="table table-bordered">
+
+
+            <tr>
+                <th>Name</th>
+                <td>
+                    @Model.User?.FullName
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Email</th>
+                <td>
+                    @Model.User?.Email
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Phone</th>
+                <td>
+                    @Model.User?.PhoneNumber
+                </td>
+            </tr>
+
+
+        </table>
+
+
+
+        <a asp-controller="Admin"
+               asp-action="PendingTransfers"
+               class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Back
+
+        </a>
+
+
+    </div>
+
+</div>

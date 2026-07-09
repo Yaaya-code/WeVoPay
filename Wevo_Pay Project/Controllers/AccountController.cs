@@ -85,9 +85,11 @@ namespace Wevo_Pay_Project.Controllers
                 principal);
 
             if (user.Role == Enums.UserRole.Admin)
+            {
                 return RedirectToAction("Dashboard", "Admin");
+            }
 
-            return RedirectToAction("MyTransfers", "Transfer");
+            return RedirectToAction("Dashboard", "User");
         }
 
 

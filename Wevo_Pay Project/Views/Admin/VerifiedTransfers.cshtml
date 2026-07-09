@@ -2,64 +2,403 @@
 
 @{
     Layout = "_AdminLayout";
+    ViewData["Title"] = "Verified Transfers";
 }
 
-<h2>Verified Transfers</h2>
 
-<table class="table">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Wallet</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+    <h2 class="fw-bold">
+        Verified Transfers
+    </h2>
+
+</div>
+
+<form method="get" asp-action="VerifiedTransfers" class="mb-4">
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Search by user, wallet or InstaPay..." />
+
+        </div>
 
 
-    <tbody>
+        <div class="col-md-2">
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @item.User.FullName
-            </td>
+            <button class="btn btn-primary w-100">
 
-            <td>
-                @item.CompanyWallet.WalletName
-            </td>
+                <i class="bi bi-search"></i>
+                Search
 
-            <td>
-                @item.TransferAmount
-            </td>
+            </button>
 
-            <td>
-                @item.Status
-            </td>
+        </div>
 
-            <td>
-                <form asp-action="Complete"
-                      method="post">
+    </div>
 
-                    @Html.AntiForgeryToken()
+</form>
 
-                    <input type="hidden"
-                           name="id"
-                           value="@item.Id" />
 
-                    <button class="btn btn-success">
-                        Complete
+
+<div class="card shadow-sm border-0 rounded-4">
+
+    <div class="card-body">
+
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                No verified transfers found.
+            </div>
+        }
+        else
+        {
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>User</th>
+                            <th>Wallet</th>
+                            <th>Amount</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+
+
+                                <td>
+                                    @item.User?.FullName
+                                </td>
+
+
+                                <td>
+                                    @item.CompanyWallet?.WalletName
+                                </td>
+
+
+                                <td>
+                                    @item.TransferAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+                                    @item.TotalAmount.ToString("N2") EGP
+                                </td>
+
+
+                                <td>
+
+                                    <span class="badge bg-info text-dark">
+                                        @item.Status
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <a asp-controller="Admin"
+                                           asp-action="TransferDetails"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-primary mb-1">
+
+                                        Details
+
+                                    </a>
+
+
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-success mb-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#completeModal-@item.Id">
+
+                                        Complete
+
+                                    </button>
+
+
+                                </td>
+
+
+                            </tr>
+
+                        }
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+        }
+
+
+    </div>
+
+</div>
+
+
+
+
+
+@foreach (var item in Model)
+{
+
+
+    <div class="modal fade"
+         id="completeModal-@item.Id"
+         tabindex="-1">
+
+
+        <div class="modal-dialog modal-dialog-centered">
+
+
+            <div class="modal-content rounded-4 shadow">
+
+
+                <div class="modal-header">
+
+
+                    <h5 class="modal-title fw-bold text-success">
+
+                        Confirm Completion
+
+                    </h5>
+
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
                     </button>
 
-                </form>
-            </td>
 
-        </tr>
-    }
+                </div>
 
-    </tbody>
 
-</table>
+
+                <div class="modal-body">
+
+
+                    <div class="card bg-light border-0 rounded-4">
+
+                        <div class="card-body">
+
+
+                            <h6 class="fw-bold mb-3">
+                                Transfer Information
+                            </h6>
+
+
+                            <p>
+                                <strong>User:</strong>
+                                @item.User?.FullName
+                            </p>
+
+
+                            <p>
+                                <strong>Wallet:</strong>
+                                @item.CompanyWallet?.WalletName
+                            </p>
+
+
+                            <p>
+                                <strong>Wallet Number:</strong>
+                                @item.CompanyWallet?.WalletNumber
+                            </p>
+
+
+                            <p>
+                                <strong>Amount:</strong>
+                                @item.TransferAmount.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>Fee:</strong>
+                                @item.Fee.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>Total:</strong>
+                                @item.TotalAmount.ToString("N2") EGP
+                            </p>
+
+
+                            <p>
+                                <strong>InstaPay:</strong>
+                                @item.InstaPayAddress
+                            </p>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="alert alert-warning mt-3">
+
+                        After completion, this transfer cannot be modified.
+
+                    </div>
+
+
+                </div>
+
+
+
+
+                <div class="modal-footer">
+
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+
+
+                    <form asp-action="Complete"
+                          method="post">
+
+
+                        @Html.AntiForgeryToken()
+
+
+                        <input type="hidden"
+                               name="id"
+                               value="@item.Id" />
+
+
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            Confirm Complete
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+}
+
+@if (ViewBag.TotalPages > 1)
+{
+
+    <nav class="mt-4">
+
+        <ul class="pagination justify-content-center">
+
+
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                           asp-action="VerifiedTransfers"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.Search">
+
+                        Previous
+
+                    </a>
+
+                </li>
+            }
+
+
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+
+
+                    <a class="page-link"
+                           asp-action="VerifiedTransfers"
+                           asp-route-page="@i"
+                           asp-route-search="@ViewBag.Search">
+
+                        @i
+
+                    </a>
+
+
+                </li>
+
+            }
+
+
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+
+                <li class="page-item">
+
+                    <a class="page-link"
+                           asp-action="VerifiedTransfers"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.Search">
+
+                        Next
+
+                    </a>
+
+                </li>
+
+            }
+
+
+        </ul>
+
+    </nav>
+
+}

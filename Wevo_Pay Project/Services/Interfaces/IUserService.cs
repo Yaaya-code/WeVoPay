@@ -18,5 +18,7 @@ namespace Wevo_Pay_Project.Services.Interfaces
         Task<bool> PhoneExistsAsync(string phone);
 
         Task<bool> UserNameExistsAsync(string userName);
+
+        Task<UserDashboardDto> GetDashboardAsync(int userId);
     }
 }

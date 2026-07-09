@@ -105,5 +105,31 @@ namespace Wevo_Pay_Project.Services
             return user;
         }
 
+        public async Task<UserDashboardDto> GetDashboardAsync(int userId)
+        {
+            var transfers = _context.TransferRequests
+                .Where(t => t.UserId == userId);
+
+            return new UserDashboardDto
+            {
+                PendingTransfers = await transfers
+                    .CountAsync(t => t.Status == TransferStatus.Pending),
+
+                CompletedTransfers = await transfers
+                    .CountAsync(t => t.Status == TransferStatus.Completed),
+
+                TotalTransfers = await transfers.CountAsync(),
+
+                TotalAmount = await transfers
+                    .SumAsync(t => (decimal?)t.TransferAmount) ?? 0 ,
+
+                RecentTransfers = await transfers
+                    .Include(t => t.CompanyWallet)
+                    .OrderByDescending(t => t.CreatedAt)
+                    .Take(5)
+                    .ToListAsync()
+            };
+        }
+
     }
 }

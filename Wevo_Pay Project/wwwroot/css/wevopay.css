@@ -1,0 +1,182 @@
+﻿:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --radius: 18px;
+    --shadow: 0 10px 35px rgba(0,0,0,.08);
+}
+
+body {
+    font-family: 'Poppins',sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Navbar */
+
+.navbar {
+    background: white !important;
+    box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    padding: 18px 0;
+}
+
+.navbar-brand {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary) !important;
+}
+
+.nav-link {
+    color: #334155 !important;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: .3s;
+}
+
+    .nav-link:hover {
+        color: var(--primary) !important;
+    }
+
+/* Buttons */
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+}
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+/* Cards */
+
+.wevo-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    border: none;
+    transition: .3s;
+}
+
+    .wevo-card:hover {
+        transform: translateY(-6px);
+    }
+
+/* Dashboard */
+
+.dashboard-card {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: .3s;
+    height: 100%;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-8px);
+    }
+
+.dashboard-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #dbeafe;
+    color: var(--primary);
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.stat-number {
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.stat-title {
+    color: var(--muted);
+}
+
+.hero {
+    background: linear-gradient(135deg,#2563eb,#3b82f6);
+    color: white;
+    border-radius: 25px;
+    padding: 60px;
+    margin-bottom: 35px;
+}
+
+    .hero h1 {
+        font-size: 45px;
+        font-weight: 700;
+    }
+
+    .hero p {
+        opacity: .9;
+        font-size: 18px;
+    }
+
+/* Tables */
+
+.table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+    .table thead {
+        background: #eff6ff;
+    }
+
+    .table th {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .table tbody tr {
+        transition: .3s;
+    }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+/* Badge */
+
+.status {
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.verified {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
