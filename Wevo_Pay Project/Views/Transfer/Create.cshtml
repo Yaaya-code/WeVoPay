@@ -5,242 +5,136 @@
 }
 
 <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
 
-    <div class="col-lg-8">
 
-        <div class="card shadow-sm border-0 rounded-4">
-
-            <div class="card-header bg-primary text-white rounded-top-4 p-4">
-
-                <h2 class="mb-1">
-                    <i class="bi bi-send"></i>
-                    New Transfer
-                </h2>
-
-                <p class="mb-0 opacity-75">
-                    Create a new transfer request securely.
-                </p>
-
+        <div class="card border-0 shadow-sm mb-4" style="overflow: hidden;">
+            <div class="card-header p-4"
+                 style="background: linear-gradient(135deg, var(--color-primary), #1e40af); color: white;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 52px; height: 52px; background-color: rgba(255,255,255,0.2);">
+                        <i class="bi bi-send fs-3"></i>
+            </div>
+                    <div>
+                        <h3 class="mb-1 fw-bold">New Transfer</h3>
+                        <p class="mb-0" style="opacity: 0.85;">Create a secure transfer request</p>
+                    </div>
+                </div>
             </div>
 
 
             <div class="card-body p-4">
-
-
                 <form asp-action="Create" method="post">
-
                     @Html.AntiForgeryToken()
-
 
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div asp-validation-summary="All"
-                             class="alert alert-danger">
-                        </div>
+                        <div asp-validation-summary="All" class="alert alert-danger mb-4"></div>
                     }
 
 
                     <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            Select Wallet
+                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
+                            Select Wallet <span class="text-danger">*</span>
                         </label>
-
-
-                        <select asp-for="CompanyWalletId"
-                                class="form-select form-select-lg">
-
-                            <option value="">
-                                -- Choose Wallet --
-                            </option>
-
-
+                        <select asp-for="CompanyWalletId" class="form-select form-select-lg">
+                            <option value="">-- Choose Wallet --</option>
                             @foreach (var wallet in ViewBag.Wallets)
                             {
-                                <option value="@wallet.Id">
-
-                                    @wallet.WalletName
-                                    -
-                                    @wallet.WalletNumber
-
-                                </option>
+                                <option value="@wallet.Id">@wallet.WalletName - @wallet.WalletNumber</option>
                             }
-
                         </select>
-
-
-                        <span asp-validation-for="CompanyWalletId"
-                              class="text-danger">
-                        </span>
-
+                        <span asp-validation-for="CompanyWalletId" class="text-danger small"></span>
                     </div>
 
 
-
                     <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            InstaPay Address
+                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
+                            InstaPay Address <span class="text-danger">*</span>
                         </label>
-
-
-                        <div class="input-group">
-
-                            <span class="input-group-text">
-                                <i class="bi bi-person"></i>
-                            </span>
-
-                            <input asp-for="InstaPayAddress"
-                                   class="form-control form-control-lg"
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="InstaPayAddress" class="form-control"
                                    placeholder="example@instapay" />
-
                         </div>
-
-
-                        <span asp-validation-for="InstaPayAddress"
-                              class="text-danger">
-                        </span>
-
+                        <span asp-validation-for="InstaPayAddress" class="text-danger small"></span>
                     </div>
-
 
 
                     <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            Transfer Amount
+                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
+                            Transfer Amount <span class="text-danger">*</span>
                         </label>
-
-
-                        <div class="input-group">
-
-                            <span class="input-group-text">
-                                EGP
-                            </span>
-
-                            <input asp-for="TransferAmount"
-                                   id="amount"
-                                   class="form-control form-control-lg"
-                                   placeholder="Enter amount" />
-
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">EGP</span>
+                            <input asp-for="TransferAmount" id="amount" class="form-control"
+                                   placeholder="0.00" />
                         </div>
-
-
-                        <span asp-validation-for="TransferAmount"
-                              class="text-danger">
-                        </span>
-
+                        <span asp-validation-for="TransferAmount" class="text-danger small"></span>
                     </div>
 
 
-
-                    <div class="card bg-light border-0 mb-4">
-
-                        <div class="card-body">
-
-                            <div class="d-flex justify-content-between mb-2">
-
-                                <span class="text-muted">
-                                    Fee
-                                </span>
-
-                                <span id="fee">
-                                    0 EGP
-                                </span>
-
+                    <div class="card mb-4" style="background-color: var(--color-gray-50); border: 1px solid var(--color-gray-200);">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span style="color: var(--color-gray-600);">Fee (1.5%)</span>
+                                <span id="fee" class="fw-semibold" style="color: var(--color-gray-800);">0.00 EGP</span>
                             </div>
-
-
-                            <div class="d-flex justify-content-between fw-bold">
-
-                                <span>
-                                    Total
-                                </span>
-
-                                <span id="total">
-                                    0 EGP
-                                </span>
-
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold" style="color: var(--color-gray-900);">Total Amount</span>
+                                <span id="total" class="fw-bold fs-5" style="color: var(--color-primary);">0.00 EGP</span>
                             </div>
-
                         </div>
-
                     </div>
-
 
 
                     <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            Notes
-                        </label>
-
-
-                        <textarea asp-for="Notes"
-                                  class="form-control"
-                                  rows="3"
-                                      placeholder="Optional notes">
-                        </textarea>
-
+                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">Notes (Optional)</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"
+                                  placeholder="Add any notes for this transfer..."></textarea>
                         </div>
 
 
-
-                        <button type="submit"
-                                class="btn btn-primary btn-lg w-100">
-
-                            <i class="bi bi-send-check"></i>
-
-                            Send Transfer Request
-
+                    <button type="submit" class="btn btn-lg w-100 py-3 fw-semibold"
+                            style="background-color: var(--color-primary); color: white; border: none;">
+                        <i class="bi bi-send-check me-2"></i> Send Transfer Request
                         </button>
 
-
+                    <p class="text-center mt-3 mb-0" style="color: var(--color-gray-500); font-size: 0.85rem;">
+                        Your request will be reviewed by our team
+                    </p>
                     </form>
-
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
     @section Scripts {
-
         <partial name="_ValidationScriptsPartial" />
-
-
         <script>
-
             const amountInput = document.getElementById("amount");
-
             const feeElement = document.getElementById("fee");
-
             const totalElement = document.getElementById("total");
 
-
-            amountInput.addEventListener("input", function () {
-
-                let amount = parseFloat(this.value) || 0;
-
-
+        function calculateFeeAndTotal() {
+            let amount = parseFloat(amountInput.value) || 0;
                 let fee = amount * 0.015;
-
                 let total = amount + fee;
 
+            feeElement.innerText = fee.toFixed(2) + " EGP";
+            totalElement.innerText = total.toFixed(2) + " EGP";
+        }
 
-                feeElement.innerText =
-                    fee.toFixed(2) + " EGP";
+        amountInput.addEventListener("input", calculateFeeAndTotal);
 
-
-                totalElement.innerText =
-                    total.toFixed(2) + " EGP";
-
+    
+        document.querySelectorAll('.quick-amount').forEach(button => {
+            button.addEventListener('click', function () {
+                const amount = this.getAttribute('data-amount');
+                amountInput.value = amount;
+                calculateFeeAndTotal();
             });
-
-
+            });
         </script>
     }

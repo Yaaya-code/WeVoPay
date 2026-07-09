@@ -1,4 +1,4 @@
-@model Wevo_Pay_Project.Models.TransferRequest
+
 
 @{
     ViewData["Title"] = "Transfer Details";
@@ -26,16 +26,29 @@
         <th>Fee</th>
         <td>@Model.Fee</td>
     </tr>
+                    </div>
 
-    <tr>
-        <th>Total</th>
-        <td>@Model.TotalAmount</td>
-    </tr>
+                    <!-- Step 2: Verified -->
+                    <div class="text-center" style="z-index: 2;">
+                        @if (Model.Status == Wevo_Pay_Project.Enums.TransferStatus.Verified ||
+                                                Model.Status == Wevo_Pay_Project.Enums.TransferStatus.Completed)
+                        {
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                                 style="width: 38px; height: 38px; background-color: var(--color-success); color: white;">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <div style="font-size: 13px; color: var(--color-gray-700);">Verified</div>
+                        }
+                        else
+                        {
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                                 style="width: 38px; height: 38px; background-color: var(--color-gray-200); color: var(--color-gray-500);">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div style="font-size: 13px; color: var(--color-gray-500);">Verified</div>
+                        }
+                    </div>
 
-    <tr>
-        <th>InstaPay Address</th>
-        <td>@Model.InstaPayAddress</td>
-    </tr>
 
     <tr>
         <th>Notes</th>
