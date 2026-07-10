@@ -1,4 +1,4 @@
-﻿using Wevo_Pay_Project.Models;
+using Wevo_Pay_Project.Models;
 
 namespace Wevo_Pay_Project.Services.Interfaces
 {
@@ -20,6 +20,5 @@ namespace Wevo_Pay_Project.Services.Interfaces
 
         Task<List<CompanyWallet>> GetAllAsync();
 
-      
     }
 }

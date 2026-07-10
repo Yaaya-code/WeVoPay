@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wevo_Pay_Project.Models;
 using Wevo_Pay_Project.Services.Interfaces;

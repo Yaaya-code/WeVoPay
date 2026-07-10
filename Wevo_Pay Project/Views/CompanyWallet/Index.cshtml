@@ -1,17 +1,15 @@
-﻿@model List<Wevo_Pay_Project.Models.CompanyWallet>
+@model List<Wevo_Pay_Project.Models.CompanyWallet>
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Wallets";
 }
 
-
 <div class="d-flex justify-content-between align-items-center mb-4">
 
     <h2 class="fw-bold">
         Company Wallets
     </h2>
-
 
     <a asp-action="Create"
            class="btn btn-primary">
@@ -22,13 +20,9 @@
 
 </div>
 
-
-
-
 <form method="get" asp-action="Index" class="mb-4">
 
     <div class="row">
-
 
         <div class="col-md-6">
 
@@ -39,8 +33,6 @@
                    placeholder="Search by wallet name or number..." />
 
         </div>
-
-
 
         <div class="col-md-2">
 
@@ -53,19 +45,13 @@
 
         </div>
 
-
     </div>
 
 </form>
 
-
-
-
-
 <div class="card shadow-sm border-0 rounded-4">
 
     <div class="card-body">
-
 
         @if (!Model.Any())
         {
@@ -78,12 +64,9 @@
         else
         {
 
-
             <div class="table-responsive">
 
-
                 <table class="table table-hover align-middle">
-
 
                     <thead>
 
@@ -99,26 +82,20 @@
 
                     </thead>
 
-
-
                     <tbody>
-
 
                         @foreach (var wallet in Model)
                         {
 
                             <tr>
 
-
                                 <td>
                                     @wallet.WalletName
                                 </td>
 
-
                                 <td>
                                     @wallet.WalletNumber
                                 </td>
-
 
                                 <td>
 
@@ -137,16 +114,11 @@
 
                                 </td>
 
-
-
                                 <td>
                                     @wallet.CreatedAt.ToString("dd/MM/yyyy")
                                 </td>
 
-
-
                                 <td>
-
 
                                     <a asp-action="Edit"
                                            asp-route-id="@wallet.Id"
@@ -156,21 +128,15 @@
 
                                     </a>
 
-
-
                                     <form asp-action="ToggleStatus"
                                           method="post"
                                           style="display:inline">
 
-
                                         @Html.AntiForgeryToken()
-
 
                                         <input type="hidden"
                                                name="id"
                                                value="@wallet.Id" />
-
-
 
                                         @if (wallet.IsActive)
                                         {
@@ -189,36 +155,25 @@
                                             </button>
                                         }
 
-
                                     </form>
 
-
                                 </td>
-
 
                             </tr>
 
                         }
 
-
                     </tbody>
 
-
                 </table>
-
 
             </div>
 
         }
 
-
     </div>
 
 </div>
-
-
-
-
 
 @if (ViewBag.TotalPages > 1)
 {
@@ -226,7 +181,6 @@
     <nav class="mt-4">
 
         <ul class="pagination justify-content-center">
-
 
             @if (ViewBag.CurrentPage > 1)
             {
@@ -246,14 +200,10 @@
 
             }
 
-
-
-
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
 
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-
 
                     <a class="page-link"
                            asp-action="Index"
@@ -264,14 +214,9 @@
 
                     </a>
 
-
                 </li>
 
             }
-
-
-
-
 
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
@@ -290,7 +235,6 @@
                 </li>
 
             }
-
 
         </ul>
 

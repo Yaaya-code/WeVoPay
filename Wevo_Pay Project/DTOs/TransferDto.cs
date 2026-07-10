@@ -1,4 +1,4 @@
-﻿namespace Wevo_Pay_Project.DTOs
+namespace Wevo_Pay_Project.DTOs
 {
     public class TransferDto
     {

@@ -1,10 +1,9 @@
-﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+@model List<Wevo_Pay_Project.Models.TransferRequest>
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Verified Transfers";
 }
-
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -28,7 +27,6 @@
 
         </div>
 
-
         <div class="col-md-2">
 
             <button class="btn btn-primary w-100">
@@ -44,12 +42,9 @@
 
 </form>
 
-
-
 <div class="card shadow-sm border-0 rounded-4">
 
     <div class="card-body">
-
 
         @if (!Model.Any())
         {
@@ -63,7 +58,6 @@
             <div class="table-responsive">
 
                 <table class="table table-hover align-middle">
-
 
                     <thead>
 
@@ -80,36 +74,28 @@
 
                     </thead>
 
-
-
                     <tbody>
-
 
                         @foreach (var item in Model)
                         {
 
                             <tr>
 
-
                                 <td>
                                     @item.User?.FullName
                                 </td>
-
 
                                 <td>
                                     @item.CompanyWallet?.WalletName
                                 </td>
 
-
                                 <td>
                                     @item.TransferAmount.ToString("N2") EGP
                                 </td>
 
-
                                 <td>
                                     @item.TotalAmount.ToString("N2") EGP
                                 </td>
-
 
                                 <td>
 
@@ -119,9 +105,7 @@
 
                                 </td>
 
-
                                 <td>
-
 
                                     <a asp-controller="Admin"
                                            asp-action="TransferDetails"
@@ -132,8 +116,6 @@
 
                                     </a>
 
-
-
                                     <button type="button"
                                             class="btn btn-sm btn-success mb-1"
                                             data-bs-toggle="modal"
@@ -143,51 +125,36 @@
 
                                     </button>
 
-
                                 </td>
-
 
                             </tr>
 
                         }
 
-
                     </tbody>
 
-
                 </table>
-
 
             </div>
 
         }
 
-
     </div>
 
 </div>
 
-
-
-
-
 @foreach (var item in Model)
 {
-
 
     <div class="modal fade"
          id="completeModal-@item.Id"
          tabindex="-1">
 
-
         <div class="modal-dialog modal-dialog-centered">
-
 
             <div class="modal-content rounded-4 shadow">
 
-
                 <div class="modal-header">
-
 
                     <h5 class="modal-title fw-bold text-success">
 
@@ -195,77 +162,61 @@
 
                     </h5>
 
-
                     <button type="button"
                             class="btn-close"
                             data-bs-dismiss="modal">
                     </button>
 
-
                 </div>
 
-
-
                 <div class="modal-body">
-
 
                     <div class="card bg-light border-0 rounded-4">
 
                         <div class="card-body">
 
-
                             <h6 class="fw-bold mb-3">
                                 Transfer Information
                             </h6>
-
 
                             <p>
                                 <strong>User:</strong>
                                 @item.User?.FullName
                             </p>
 
-
                             <p>
                                 <strong>Wallet:</strong>
                                 @item.CompanyWallet?.WalletName
                             </p>
-
 
                             <p>
                                 <strong>Wallet Number:</strong>
                                 @item.CompanyWallet?.WalletNumber
                             </p>
 
-
                             <p>
                                 <strong>Amount:</strong>
                                 @item.TransferAmount.ToString("N2") EGP
                             </p>
-
 
                             <p>
                                 <strong>Fee:</strong>
                                 @item.Fee.ToString("N2") EGP
                             </p>
 
-
                             <p>
                                 <strong>Total:</strong>
                                 @item.TotalAmount.ToString("N2") EGP
                             </p>
-
 
                             <p>
                                 <strong>InstaPay:</strong>
                                 @item.InstaPayAddress
                             </p>
 
-
                         </div>
 
                     </div>
-
-
 
                     <div class="alert alert-warning mt-3">
 
@@ -273,14 +224,9 @@
 
                     </div>
 
-
                 </div>
 
-
-
-
                 <div class="modal-footer">
-
 
                     <button type="button"
                             class="btn btn-secondary"
@@ -290,20 +236,14 @@
 
                     </button>
 
-
-
                     <form asp-action="Complete"
                           method="post">
 
-
                         @Html.AntiForgeryToken()
-
 
                         <input type="hidden"
                                name="id"
                                value="@item.Id" />
-
-
 
                         <button type="submit"
                                 class="btn btn-success">
@@ -312,21 +252,15 @@
 
                         </button>
 
-
                     </form>
-
 
                 </div>
 
-
             </div>
-
 
         </div>
 
-
     </div>
-
 
 }
 
@@ -336,7 +270,6 @@
     <nav class="mt-4">
 
         <ul class="pagination justify-content-center">
-
 
             @if (ViewBag.CurrentPage > 1)
             {
@@ -354,13 +287,10 @@
                 </li>
             }
 
-
-
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
 
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-
 
                     <a class="page-link"
                            asp-action="VerifiedTransfers"
@@ -371,12 +301,9 @@
 
                     </a>
 
-
                 </li>
 
             }
-
-
 
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
@@ -395,7 +322,6 @@
                 </li>
 
             }
-
 
         </ul>
 

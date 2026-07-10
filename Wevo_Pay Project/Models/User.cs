@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Wevo_Pay_Project.Enums;
 
 namespace Wevo_Pay_Project.Models
@@ -31,6 +31,10 @@ namespace Wevo_Pay_Project.Models
         public bool IsVerified { get; set; } = false;
 
         public DateTime CreatedAt { get; set; }
+
+        public int? ReferredByUserId { get; set; }
+
+        public User? ReferredByUser { get; set; }
 
         public ICollection<TransferRequest> TransferRequests { get; set; }
             = new List<TransferRequest>();

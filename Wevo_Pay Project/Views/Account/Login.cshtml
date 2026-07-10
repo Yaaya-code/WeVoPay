@@ -1,44 +1,195 @@
-﻿@model Wevo_Pay_Project.DTOs.LoginDto
+@model Wevo_Pay_Project.DTOs.LoginDto
 
 @{
     ViewData["Title"] = "Login";
+    ViewData["FullWidth"] = true;
 }
 
-<h2>Login</h2>
-
-
-<form asp-action="Login" method="post">
-
-    @Html.AntiForgeryToken()
-
-    <div asp-validation-summary="All" class="text-danger"></div>
-
-
-    <div>
-        <label>Email or Username</label>
-
-        <input asp-for="EmailOrUserName"
-               class="form-control" />
-
-        <span asp-validation-for="EmailOrUserName"
-              class="text-danger"></span>
+<div class="auth-page">
+    <div class="auth-bg" aria-hidden="true">
+        <span class="auth-shape auth-shape-circle auth-shape-1"></span>
+        <span class="auth-shape auth-shape-circle auth-shape-2"></span>
+        <span class="auth-shape auth-shape-circle auth-shape-3"></span>
+        <span class="auth-shape auth-shape-ring auth-shape-4"></span>
+        <span class="auth-shape auth-shape-ring auth-shape-5"></span>
+        <span class="auth-shape auth-shape-blob auth-shape-6"></span>
+        <span class="auth-shape auth-shape-blob auth-shape-7"></span>
+        <span class="auth-shape auth-shape-square auth-shape-8"></span>
+        <span class="auth-shape auth-shape-square auth-shape-9"></span>
+        <div class="auth-grid"></div>
+        <div class="auth-dots"></div>
     </div>
 
+    <div class="auth-page-inner">
 
-    <div>
-        <label>Password</label>
+        <div class="auth-card auth-card-wide wevo-card">
+            <div class="auth-side">
+                <div class="auth-side-content">
+                    <div class="auth-side-badge">
+                        <i class="bi bi-wallet2"></i>
+                        Wevo Pay
+                    </div>
+                    <h2 class="auth-side-title">Move money between Egyptian wallets &amp; InstaPay</h2>
+                    <p class="auth-side-text">
+                        Can't send from Vodafone Cash or other Egyptian wallets to InstaPay directly?
+                        Wevo Pay bridges that gap - safe, tracked, peer-to-peer transfers made for Egypt.
+                    </p>
+                    <ul class="auth-features">
+                        <li>
+                            <span class="auth-feature-icon"><i class="bi bi-phone"></i></span>
+                            Vodafone Cash &amp; Egyptian wallets
+                        </li>
+                        <li>
+                            <span class="auth-feature-icon"><i class="bi bi-bank"></i></span>
+                            Connect to InstaPay smoothly
+                        </li>
+                        <li>
+                            <span class="auth-feature-icon"><i class="bi bi-shield-check"></i></span>
+                            Escrow-style protection on every transfer
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="auth-main">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h1 class="auth-title">Welcome back</h1>
+                    <p class="auth-subtitle">Sign in to your Wevo Pay account</p>
+                </div>
 
-        <input asp-for="Password"
-               type="password"
-               class="form-control" />
+                <form asp-action="Login" method="post" class="auth-form" id="loginForm" novalidate>
+                    @Html.AntiForgeryToken()
 
-        <span asp-validation-for="Password"
-              class="text-danger"></span>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger auth-alert" role="alert"></div>
+
+                    <div class="auth-field mb-4">
+                        <label asp-for="EmailOrUserName" class="form-label">
+                            Email or Username
+                        </label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-person input-icon"></i>
+                            <input asp-for="EmailOrUserName"
+                                   class="form-control form-control-lg auth-input"
+                                   placeholder="Enter your email or username"
+                                   autocomplete="username" />
+                        </div>
+                        <span asp-validation-for="EmailOrUserName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="auth-field mb-4">
+                        <label asp-for="Password" class="form-label">
+                            Password
+                        </label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="form-control form-control-lg auth-input auth-input-password"
+                                   id="passwordInput"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password" />
+                            <button type="button"
+                                    class="auth-toggle-password"
+                                    id="togglePassword"
+                                    aria-label="Show password"
+                                    title="Show password">
+                                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 auth-submit" id="loginSubmit">
+                        <span class="auth-submit-label">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>
+                            Sign In
+                        </span>
+                        <span class="auth-submit-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Signing in...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p class="mb-0">
+                        Don't have an account?
+                        <a asp-controller="Account" asp-action="Register" class="auth-link">
+                            Create one
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="auth-trust text-center">
+            <i class="bi bi-lock-fill"></i>
+            Secure encrypted connection
+        </p>
+
     </div>
+</div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const page = document.querySelector('.auth-page');
+            const shapes = document.querySelectorAll('.auth-shape');
+            const toggleBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('loginSubmit');
 
-    <button type="submit" class="btn btn-primary">
-        Login
-    </button>
+            if (toggleBtn && passwordInput && toggleIcon) {
+                toggleBtn.addEventListener('click', function () {
+                    const isHidden = passwordInput.type === 'password';
+                    passwordInput.type = isHidden ? 'text' : 'password';
+                    toggleIcon.classList.toggle('bi-eye', !isHidden);
+                    toggleIcon.classList.toggle('bi-eye-slash', isHidden);
+                    toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                    toggleBtn.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+                });
+            }
 
-</form>
+            document.querySelectorAll('.input-icon-group .auth-input').forEach(function (input) {
+                input.addEventListener('focus', function () {
+                    input.closest('.input-icon-group')?.classList.add('is-focused');
+                });
+                input.addEventListener('blur', function () {
+                    input.closest('.input-icon-group')?.classList.remove('is-focused');
+                });
+            });
+
+            if (form && submitBtn) {
+                form.addEventListener('submit', function () {
+                    if (!form.checkValidity || form.checkValidity()) {
+                        submitBtn.classList.add('is-loading');
+                        submitBtn.disabled = true;
+                        const label = submitBtn.querySelector('.auth-submit-label');
+                        const loading = submitBtn.querySelector('.auth-submit-loading');
+                        if (label) label.classList.add('d-none');
+                        if (loading) loading.classList.remove('d-none');
+                    }
+                });
+            }
+
+            if (page && shapes.length) {
+                page.addEventListener('mousemove', function (e) {
+                    const rect = page.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width - 0.5;
+                    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+                    shapes.forEach(function (shape, index) {
+                        const depth = (index % 4 + 1) * 6;
+                        shape.style.translate = (x * depth) + 'px ' + (y * depth) + 'px';
+                    });
+                });
+            }
+        })();
+    </script>
+}

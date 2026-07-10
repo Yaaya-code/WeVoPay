@@ -1,22 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WevoPay</title>
 
-    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <!-- Project CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/wevopay.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
@@ -29,13 +25,16 @@
     <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
         <div class="container">
 
-            <a class="navbar-brand fw-bold fs-3 text-primary"
-                   asp-controller="Home"
-                   asp-action="Index">
-
-                <i class="bi bi-wallet2"></i>
-                WevoPay
-
+            <a class="navbar-brand d-flex align-items-center gap-2"
+               asp-controller="Home"
+               asp-action="Index">
+                <img src="~/images/logo.png"
+                     alt="Wevo Pay"
+                     class="navbar-logo"
+                     asp-append-version="true" />
+                <span class="brand-text">
+                    Wevo <span class="brand-accent">Pay</span>
+                </span>
             </a>
 
             <button class="navbar-toggler"
@@ -49,7 +48,26 @@
 
             <div class="collapse navbar-collapse" id="navbarMenu">
 
-                @if (User.Identity?.IsAuthenticated == true)
+                @if (ViewData["FullWidth"] as bool? == true)
+                {
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Account"
+                               asp-action="Login">
+                                Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary ms-2 px-4"
+                               asp-controller="Account"
+                               asp-action="Register">
+                                Get Started
+                            </a>
+                        </li>
+                    </ul>
+                }
+                else if (User.Identity?.IsAuthenticated == true)
                 {
                     <ul class="navbar-nav mx-auto">
 
@@ -61,15 +79,6 @@
                                        asp-action="Dashboard">
                                     <i class="bi bi-speedometer2"></i>
                                     Dashboard
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                       asp-controller="CompanyWallet"
-                                       asp-action="Index">
-                                    <i class="bi bi-wallet"></i>
-                                    Wallets
                                 </a>
                             </li>
 
@@ -104,6 +113,15 @@
 
                             <li class="nav-item">
                                 <a class="nav-link"
+                                   asp-controller="Rates"
+                                   asp-action="Index">
+                                    <i class="bi bi-currency-exchange"></i>
+                                    Rates
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
                                        asp-controller="Transfer"
                                        asp-action="Create">
                                     <i class="bi bi-plus-circle"></i>
@@ -113,10 +131,34 @@
 
                             <li class="nav-item">
                                 <a class="nav-link"
-                                       asp-controller="Transfer"
-                                       asp-action="MyTransfers">
+                                   asp-controller="Transfer"
+                                   asp-action="MyTransfers">
                                     <i class="bi bi-clock-history"></i>
                                     My Transfers
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="User"
+                                   asp-action="Profile">
+                                    <i class="bi bi-person"></i>
+                                    Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Message"
+                                   asp-action="Index">
+                                    <i class="bi bi-chat-dots"></i>
+                                    Messages
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="User"
+                                   asp-action="Settings">
+                                    <i class="bi bi-gear"></i>
+                                    Settings
                                 </a>
                             </li>
                         }
@@ -141,7 +183,7 @@
 
                                 <li>
                                     <h6 class="dropdown-header">
-                                        Welcome 👋
+                                        Welcome ??
                                     </h6>
                                 </li>
 
@@ -152,6 +194,27 @@
                                 </li>
 
                                 <li><hr class="dropdown-divider" /></li>
+
+                                @if (!User.IsInRole("Admin"))
+                                {
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="User"
+                                           asp-action="Settings">
+                                            <i class="bi bi-gear me-2"></i>
+                                            Settings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="User"
+                                           asp-action="Profile">
+                                            <i class="bi bi-person me-2"></i>
+                                            Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                }
 
                                 <li>
 
@@ -206,17 +269,24 @@
         </div>
     </nav>
 
-    <main class="container py-5">
-
-        @RenderBody()
-
-    </main>
+    @if (ViewData["FullWidth"] as bool? == true)
+    {
+        <main>
+            @RenderBody()
+        </main>
+    }
+    else
+    {
+        <main class="container py-5">
+            @RenderBody()
+        </main>
+    }
 
     <footer class="bg-white border-top mt-5">
 
         <div class="container py-4 text-center text-muted">
 
-            © @DateTime.Now.Year WevoPay. All rights reserved.
+             (c) @DateTime.Now.Year WevoPay. All rights reserved.
 
         </div>
 

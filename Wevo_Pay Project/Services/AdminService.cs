@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wevo_Pay_Project.Data;
 using Wevo_Pay_Project.DTOs;
 using Wevo_Pay_Project.Enums;

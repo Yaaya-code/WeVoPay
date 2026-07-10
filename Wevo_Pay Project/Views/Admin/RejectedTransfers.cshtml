@@ -1,10 +1,9 @@
-﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+@model List<Wevo_Pay_Project.Models.TransferRequest>
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Rejected Transfers";
 }
-
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -13,8 +12,6 @@
     </h2>
 
 </div>
-
-
 
 <form method="get" asp-action="RejectedTransfers" class="mb-4">
 
@@ -29,7 +26,6 @@
                    placeholder="Search by user, wallet or InstaPay..." />
 
         </div>
-
 
         <div class="col-md-2">
 
@@ -46,13 +42,9 @@
 
 </form>
 
-
-
-
 <div class="card shadow-sm border-0 rounded-4">
 
     <div class="card-body">
-
 
         @if (!Model.Any())
         {
@@ -66,7 +58,6 @@
             <div class="table-responsive">
 
                 <table class="table table-hover align-middle">
-
 
                     <thead>
 
@@ -86,46 +77,36 @@
 
                     </thead>
 
-
-
                     <tbody>
-
 
                         @foreach (var item in Model)
                         {
 
                             <tr>
 
-
                                 <td>
                                     @(item.User?.FullName ?? "-")
                                 </td>
-
 
                                 <td>
                                     @(item.CompanyWallet?.WalletName ?? "-")
                                 </td>
 
-
                                 <td>
                                     @item.TransferAmount.ToString("N2") EGP
                                 </td>
-
 
                                 <td>
                                     @item.Fee.ToString("N2") EGP
                                 </td>
 
-
                                 <td>
                                     @item.TotalAmount.ToString("N2") EGP
                                 </td>
 
-
                                 <td>
                                     @(item.InstaPayAddress ?? "-")
                                 </td>
-
 
                                 <td>
 
@@ -137,13 +118,11 @@
 
                                 </td>
 
-
                                 <td>
 
                                     @(item.RejectedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")
 
                                 </td>
-
 
                                 <td>
 
@@ -158,30 +137,21 @@
 
                                 </td>
 
-
                             </tr>
 
                         }
 
-
                     </tbody>
 
-
                 </table>
-
 
             </div>
 
         }
 
-
     </div>
 
 </div>
-
-
-
-
 
 @if (ViewBag.TotalPages > 1)
 {
@@ -189,7 +159,6 @@
     <nav class="mt-4">
 
         <ul class="pagination justify-content-center">
-
 
             @if (ViewBag.CurrentPage > 1)
             {
@@ -206,8 +175,6 @@
 
                 </li>
             }
-
-
 
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
@@ -227,8 +194,6 @@
 
             }
 
-
-
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
                 <li class="page-item">
@@ -244,7 +209,6 @@
 
                 </li>
             }
-
 
         </ul>
 

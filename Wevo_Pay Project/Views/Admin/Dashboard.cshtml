@@ -1,10 +1,9 @@
-﻿@model Wevo_Pay_Project.DTOs.AdminDashboardDto
+@model Wevo_Pay_Project.DTOs.AdminDashboardDto
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
 }
-
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -20,10 +19,7 @@
 
 </div>
 
-
-
 <div class="row g-4">
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -45,7 +41,6 @@
 
                     </div>
 
-
                     <i class="bi bi-people fs-1 text-primary"></i>
 
                 </div>
@@ -55,9 +50,6 @@
         </div>
 
     </div>
-
-
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -79,7 +71,6 @@
 
                     </div>
 
-
                     <i class="bi bi-wallet2 fs-1 text-success"></i>
 
                 </div>
@@ -89,9 +80,6 @@
         </div>
 
     </div>
-
-
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -113,7 +101,6 @@
 
                     </div>
 
-
                     <i class="bi bi-clock-history fs-1 text-warning"></i>
 
                 </div>
@@ -123,9 +110,6 @@
         </div>
 
     </div>
-
-
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -147,7 +131,6 @@
 
                     </div>
 
-
                     <i class="bi bi-patch-check fs-1 text-info"></i>
 
                 </div>
@@ -157,9 +140,6 @@
         </div>
 
     </div>
-
-
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -181,7 +161,6 @@
 
                     </div>
 
-
                     <i class="bi bi-check-circle fs-1 text-success"></i>
 
                 </div>
@@ -191,9 +170,6 @@
         </div>
 
     </div>
-
-
-
 
     <div class="col-lg-3 col-md-4">
 
@@ -215,7 +191,6 @@
 
                     </div>
 
-
                     <i class="bi bi-x-circle fs-1 text-danger"></i>
 
                 </div>
@@ -226,16 +201,9 @@
 
     </div>
 
-
-
 </div>
 
-
-
-
-
 <div class="row g-4 mt-2">
-
 
     <div class="col-md-6">
 
@@ -247,20 +215,15 @@
                     Total Revenue
                 </h6>
 
-
                 <h2 class="fw-bold">
                     @Model.TotalRevenue.ToString("N2") EGP
                 </h2>
-
 
             </div>
 
         </div>
 
     </div>
-
-
-
 
     <div class="col-md-6">
 
@@ -272,17 +235,14 @@
                     Today's Revenue
                 </h6>
 
-
                 <h2 class="fw-bold">
                     @Model.TodayRevenue.ToString("N2") EGP
                 </h2>
-
 
             </div>
 
         </div>
 
     </div>
-
 
 </div>

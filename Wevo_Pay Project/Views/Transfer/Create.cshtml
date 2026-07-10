@@ -1,140 +1,328 @@
-﻿@model Wevo_Pay_Project.DTOs.CreateTransferDto
+@model Wevo_Pay_Project.DTOs.CreateTransferDto
 
 @{
     ViewData["Title"] = "Create Transfer";
+
+    var wallets = ViewBag.Wallets as IEnumerable<Wevo_Pay_Project.Models.CompanyWallet>
+                  ?? Enumerable.Empty<Wevo_Pay_Project.Models.CompanyWallet>();
+
+    decimal feePercentage = ViewBag.FeePercentage is decimal fp ? fp : 1.5m;
+    decimal minAmount = ViewBag.MinTransferAmount is decimal min ? min : 10m;
+    decimal maxAmount = ViewBag.MaxTransferAmount is decimal max ? max : 50000m;
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-7 col-xl-6">
+<div class="create-page">
+    <div class="create-header mb-4">
+        <div>
+            <span class="create-eyebrow">
+                <i class="bi bi-arrow-left-right"></i>
+                Wallet -> InstaPay
+            </span>
+            <h1 class="create-title">Create Transfer</h1>
+            <p class="create-subtitle mb-0">
+                Send money from Vodafone Cash or other Egyptian wallets to InstaPay through Wevo Pay.
+            </p>
+        </div>
+        <a asp-controller="Transfer" asp-action="MyTransfers" class="btn btn-outline-primary rounded-pill px-3 create-back-btn">
+            <i class="bi bi-clock-history me-1"></i>
+            My Transfers
+        </a>
+    </div>
 
-
-        <div class="card border-0 shadow-sm mb-4" style="overflow: hidden;">
-            <div class="card-header p-4"
-                 style="background: linear-gradient(135deg, var(--color-primary), #1e40af); color: white;">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center"
-                         style="width: 52px; height: 52px; background-color: rgba(255,255,255,0.2);">
-                        <i class="bi bi-send fs-3"></i>
-            </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="create-card">
+                <div class="create-card-head">
+                    <div class="create-card-icon">
+                        <i class="bi bi-send"></i>
+                    </div>
                     <div>
-                        <h3 class="mb-1 fw-bold">New Transfer</h3>
-                        <p class="mb-0" style="opacity: 0.85;">Create a secure transfer request</p>
+                        <h2 class="create-card-title">Transfer details</h2>
+                        <p class="create-card-sub mb-0">Fill in the fields below to start your request</p>
                     </div>
                 </div>
-            </div>
 
-
-            <div class="card-body p-4">
-                <form asp-action="Create" method="post">
+                <form asp-action="Create" method="post" id="createTransferForm" novalidate>
                     @Html.AntiForgeryToken()
 
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div asp-validation-summary="All" class="alert alert-danger mb-4"></div>
-                    }
-
-
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger create-alert" role="alert"></div>
                     <div class="mb-4">
-                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
-                            Select Wallet <span class="text-danger">*</span>
+                        <label asp-for="CompanyWalletId" class="form-label create-label">
+                            Company wallet
+                            <span class="text-danger">*</span>
                         </label>
-                        <select asp-for="CompanyWalletId" class="form-select form-select-lg">
-                            <option value="">-- Choose Wallet --</option>
-                            @foreach (var wallet in ViewBag.Wallets)
-                            {
-                                <option value="@wallet.Id">@wallet.WalletName - @wallet.WalletNumber</option>
-                            }
-                        </select>
+                        <p class="create-hint">Choose the Egyptian wallet you'll send money to</p>
+                        <div class="input-icon-group">
+                            <i class="bi bi-wallet2 input-icon"></i>
+                            <select asp-for="CompanyWalletId"
+                                    class="form-select form-select-lg create-input create-select"
+                                    id="walletSelect">
+                                <option value="">-- Choose wallet --</option>
+                                @foreach (var wallet in wallets)
+                                {
+                                    <option value="@wallet.Id"
+                                            data-name="@wallet.WalletName"
+                                            data-number="@wallet.WalletNumber">
+                                        @wallet.WalletName - @wallet.WalletNumber
+                                    </option>
+                                }
+                            </select>
+                        </div>
                         <span asp-validation-for="CompanyWalletId" class="text-danger small"></span>
+
+                        <div id="walletPreview" class="wallet-preview d-none">
+                            <i class="bi bi-info-circle"></i>
+                            <div>
+                                <strong id="walletPreviewName">Wallet</strong>
+                                <span>Send the total amount to:
+                                    <code id="walletPreviewNumber">-</code>
+                                </span>
+                            </div>
+                        </div>
                     </div>
-
-
                     <div class="mb-4">
-                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
-                            InstaPay Address <span class="text-danger">*</span>
+                        <label asp-for="InstaPayAddress" class="form-label create-label">
+                            InstaPay address
+                            <span class="text-danger">*</span>
                         </label>
-                        <div class="input-group input-group-lg">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input asp-for="InstaPayAddress" class="form-control"
-                                   placeholder="example@instapay" />
+                        <p class="create-hint">Where you want to receive the money on InstaPay</p>
+                        <div class="input-icon-group">
+                            <i class="bi bi-bank input-icon"></i>
+                            <input asp-for="InstaPayAddress"
+                                   class="form-control form-control-lg create-input"
+                                   placeholder="example@instapay"
+                                   autocomplete="off" />
                         </div>
                         <span asp-validation-for="InstaPayAddress" class="text-danger small"></span>
                     </div>
-
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">
-                            Transfer Amount <span class="text-danger">*</span>
+                    <div class="mb-3">
+                        <label asp-for="TransferAmount" class="form-label create-label">
+                            Transfer amount
+                            <span class="text-danger">*</span>
                         </label>
-                        <div class="input-group input-group-lg">
-                            <span class="input-group-text">EGP</span>
-                            <input asp-for="TransferAmount" id="amount" class="form-control"
-                                   placeholder="0.00" />
+                        <p class="create-hint">
+                            Allowed range: @minAmount.ToString("N0") - @maxAmount.ToString("N0") EGP
+                        </p>
+
+                        <div class="quick-amount-row mb-3">
+                            <button type="button" class="quick-amount-btn" data-amount="500">500</button>
+                            <button type="button" class="quick-amount-btn" data-amount="1000">1,000</button>
+                            <button type="button" class="quick-amount-btn" data-amount="2000">2,000</button>
+                            <button type="button" class="quick-amount-btn" data-amount="5000">5,000</button>
+                            <button type="button" class="quick-amount-btn" data-amount="10000">10,000</button>
+                        </div>
+
+                        <div class="input-icon-group">
+                            <span class="input-currency">EGP</span>
+                            <input asp-for="TransferAmount"
+                                   id="amount"
+                                   class="form-control form-control-lg create-input create-input-amount"
+                                   placeholder="0.00"
+                                   inputmode="decimal"
+                                   min="@minAmount"
+                                   max="@maxAmount"
+                                   step="0.01" />
                         </div>
                         <span asp-validation-for="TransferAmount" class="text-danger small"></span>
                     </div>
-
-
-                    <div class="card mb-4" style="background-color: var(--color-gray-50); border: 1px solid var(--color-gray-200);">
-                        <div class="card-body py-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span style="color: var(--color-gray-600);">Fee (1.5%)</span>
-                                <span id="fee" class="fw-semibold" style="color: var(--color-gray-800);">0.00 EGP</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold" style="color: var(--color-gray-900);">Total Amount</span>
-                                <span id="total" class="fw-bold fs-5" style="color: var(--color-primary);">0.00 EGP</span>
-                            </div>
+                    <div class="fee-summary mb-4"
+                         data-fee-percentage="@feePercentage.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                        <div class="fee-summary-row">
+                            <span>Transfer amount</span>
+                            <strong id="summaryAmount">0.00 EGP</strong>
                         </div>
+                        <div class="fee-summary-row">
+                            <span>Service fee (@feePercentage.ToString("0.##")%)</span>
+                            <strong id="fee">0.00 EGP</strong>
+                        </div>
+                        <div class="fee-summary-divider"></div>
+                        <div class="fee-summary-row fee-summary-total">
+                            <span>Total to send</span>
+                            <strong id="total">0.00 EGP</strong>
+                        </div>
+                        <p class="fee-summary-note mb-0">
+                            <i class="bi bi-shield-check"></i>
+                            You'll send this total to the selected company wallet.
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Notes" class="form-label create-label">
+                            Notes <span class="text-muted fw-normal">(optional)</span>
+                        </label>
+                        <textarea asp-for="Notes"
+                                  class="form-control create-input create-textarea"
+                                  rows="3"
+                                  placeholder="Add a note for yourself or the admin..."
+                                  maxlength="250"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger small"></span>
                     </div>
 
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold" style="color: var(--color-gray-700);">Notes (Optional)</label>
-                        <textarea asp-for="Notes" class="form-control" rows="3"
-                                  placeholder="Add any notes for this transfer..."></textarea>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 create-submit" id="createSubmit">
+                        <span class="create-submit-label">
+                            <i class="bi bi-send-check me-2"></i>
+                            Submit transfer request
+                        </span>
+                        <span class="create-submit-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Submitting...
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="create-side-card mb-3">
+                <h3 class="create-side-title">How this works</h3>
+                <ol class="create-steps">
+                    <li>
+                        <span class="create-step-num">1</span>
+                        <div>
+                            <strong>Choose wallet</strong>
+                            <p>Pick the Egyptian wallet you'll pay into (e.g. Vodafone Cash).</p>
                         </div>
+                    </li>
+                    <li>
+                        <span class="create-step-num">2</span>
+                        <div>
+                            <strong>Enter InstaPay</strong>
+                            <p>Add the InstaPay address that should receive the money.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="create-step-num">3</span>
+                        <div>
+                            <strong>Submit &amp; send</strong>
+                            <p>Confirm, then send the total to our wallet within 1 hour (or it auto-cancels).</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="create-step-num">4</span>
+                        <div>
+                            <strong>Get paid</strong>
+                            <p>After verification, funds are released to your InstaPay.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
 
-
-                    <button type="submit" class="btn btn-lg w-100 py-3 fw-semibold"
-                            style="background-color: var(--color-primary); color: white; border: none;">
-                        <i class="bi bi-send-check me-2"></i> Send Transfer Request
-                        </button>
-
-                    <p class="text-center mt-3 mb-0" style="color: var(--color-gray-500); font-size: 0.85rem;">
-                        Your request will be reviewed by our team
+            <div class="create-deadline-card mb-3">
+                <div class="create-deadline-icon">
+                    <i class="bi bi-stopwatch"></i>
+                </div>
+                <div>
+                    <h3 class="create-deadline-title">1-hour limit</h3>
+                    <p class="create-deadline-text mb-0">
+                        After you submit, an admin has only <strong>1 hour</strong> to verify your request.
+                        If they don't, it is <strong>cancelled automatically</strong>.
+                        Send the total amount to the company wallet right after creating the transfer.
                     </p>
-                    </form>
+                </div>
+            </div>
+
+            <div class="create-tip-card">
+                <div class="create-tip-icon">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+                <div>
+                    <h3 class="create-tip-title">Why Wevo Pay?</h3>
+                    <p class="create-tip-text mb-0">
+                        Egyptian wallets can't transfer directly to InstaPay.
+                        Wevo Pay bridges that gap with secure, tracked P2P transfers.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-        <script>
-            const amountInput = document.getElementById("amount");
-            const feeElement = document.getElementById("fee");
-            const totalElement = document.getElementById("total");
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const amountInput = document.getElementById('amount');
+            const feeElement = document.getElementById('fee');
+            const totalElement = document.getElementById('total');
+            const summaryAmount = document.getElementById('summaryAmount');
+            const feeBox = document.querySelector('.fee-summary');
+            const feePct = parseFloat(feeBox?.dataset.feePercentage || '1.5') || 1.5;
 
-        function calculateFeeAndTotal() {
-            let amount = parseFloat(amountInput.value) || 0;
-                let fee = amount * 0.015;
-                let total = amount + fee;
+            const walletSelect = document.getElementById('walletSelect');
+            const walletPreview = document.getElementById('walletPreview');
+            const walletPreviewName = document.getElementById('walletPreviewName');
+            const walletPreviewNumber = document.getElementById('walletPreviewNumber');
 
-            feeElement.innerText = fee.toFixed(2) + " EGP";
-            totalElement.innerText = total.toFixed(2) + " EGP";
-        }
+            const form = document.getElementById('createTransferForm');
+            const submitBtn = document.getElementById('createSubmit');
 
-        amountInput.addEventListener("input", calculateFeeAndTotal);
+            function formatMoney(value) {
+                return value.toLocaleString('en-EG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + ' EGP';
+            }
 
-    
-        document.querySelectorAll('.quick-amount').forEach(button => {
-            button.addEventListener('click', function () {
-                const amount = this.getAttribute('data-amount');
-                amountInput.value = amount;
-                calculateFeeAndTotal();
+            function calculateFeeAndTotal() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const fee = Math.round((amount * feePct / 100) * 100) / 100;
+                const total = Math.round((amount + fee) * 100) / 100;
+
+                if (summaryAmount) summaryAmount.textContent = formatMoney(amount);
+                feeElement.textContent = formatMoney(fee);
+                totalElement.textContent = formatMoney(total);
+            }
+
+            function updateWalletPreview() {
+                const option = walletSelect?.options[walletSelect.selectedIndex];
+                if (!option || !option.value) {
+                    walletPreview?.classList.add('d-none');
+                    return;
+                }
+
+                walletPreviewName.textContent = option.dataset.name || option.text;
+                walletPreviewNumber.textContent = option.dataset.number || '-';
+                walletPreview?.classList.remove('d-none');
+            }
+
+            amountInput?.addEventListener('input', calculateFeeAndTotal);
+
+            document.querySelectorAll('.quick-amount-btn').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    document.querySelectorAll('.quick-amount-btn').forEach(function (b) {
+                        b.classList.remove('is-active');
+                    });
+                    button.classList.add('is-active');
+                    amountInput.value = button.getAttribute('data-amount');
+                    calculateFeeAndTotal();
+                    amountInput.dispatchEvent(new Event('input'));
+                });
             });
+
+            walletSelect?.addEventListener('change', updateWalletPreview);
+
+            document.querySelectorAll('.input-icon-group .create-input, .input-icon-group .create-select').forEach(function (el) {
+                el.addEventListener('focus', function () {
+                    el.closest('.input-icon-group')?.classList.add('is-focused');
+                });
+                el.addEventListener('blur', function () {
+                    el.closest('.input-icon-group')?.classList.remove('is-focused');
+                });
             });
-        </script>
-    }
+
+            if (form && submitBtn) {
+                form.addEventListener('submit', function () {
+                    if (!form.checkValidity || form.checkValidity()) {
+                        submitBtn.classList.add('is-loading');
+                        submitBtn.disabled = true;
+                        const label = submitBtn.querySelector('.create-submit-label');
+                        const loading = submitBtn.querySelector('.create-submit-loading');
+                        if (label) label.classList.add('d-none');
+                        if (loading) loading.classList.remove('d-none');
+                    }
+                });
+            }
+
+            calculateFeeAndTotal();
+            updateWalletPreview();
+        })();
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wevo_Pay_Project.Data;
 using Wevo_Pay_Project.DTOs;
@@ -60,7 +60,33 @@ namespace Wevo_Pay_Project.Services
             dto.Email = dto.Email.Trim();
             dto.UserName = dto.UserName.Trim();
             dto.PhoneNumber = dto.PhoneNumber.Trim();
+            dto.FullName = dto.FullName.Trim();
 
+            int? referredByUserId = null;
+
+            if (dto.WasReferred)
+            {
+                if (string.IsNullOrWhiteSpace(dto.ReferralCode))
+                    throw new Exception("Please enter the referral link or username.");
+
+                var referrerUserName = ExtractReferralUserName(dto.ReferralCode);
+
+                if (string.IsNullOrWhiteSpace(referrerUserName))
+                    throw new Exception("Invalid referral link or username.");
+
+                if (string.Equals(referrerUserName, dto.UserName, StringComparison.OrdinalIgnoreCase))
+                    throw new Exception("You cannot refer yourself.");
+
+                var referrer = await _context.Users
+                    .FirstOrDefaultAsync(u =>
+                        u.UserName.ToLower() == referrerUserName.ToLower() &&
+                        u.Role == UserRole.User);
+
+                if (referrer == null)
+                    throw new Exception("Referral not found. Check the link or username and try again.");
+
+                referredByUserId = referrer.Id;
+            }
 
             var user = new User
             {
@@ -69,12 +95,11 @@ namespace Wevo_Pay_Project.Services
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 Role = UserRole.User,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                ReferredByUserId = referredByUserId
             };
 
-
             user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
-
 
             _context.Users.Add(user);
 
@@ -83,11 +108,46 @@ namespace Wevo_Pay_Project.Services
             return user;
         }
 
+        private static string ExtractReferralUserName(string input)
+        {
+            input = input.Trim();
+
+            var refIndex = input.IndexOf("/ref/", StringComparison.OrdinalIgnoreCase);
+            if (refIndex >= 0)
+            {
+                var after = input[(refIndex + 5)..];
+                after = after.Split('?', '#')[0].Trim('/');
+                return after;
+            }
+
+            if (input.Contains("ref=", StringComparison.OrdinalIgnoreCase))
+            {
+                var query = input.Contains('?')
+                    ? input[(input.IndexOf('?') + 1)..]
+                    : input;
+
+                foreach (var part in query.Split('&'))
+                {
+                    var kv = part.Split('=', 2);
+                    if (kv.Length == 2 &&
+                        kv[0].Equals("ref", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Uri.UnescapeDataString(kv[1]).Trim();
+                    }
+                }
+            }
+
+            return input.Trim().TrimStart('@');
+        }
+
         public async Task<User?> LoginAsync(LoginDto dto)
         {
+            var login = (dto.EmailOrUserName ?? string.Empty).Trim();
+            var password = dto.Password ?? string.Empty;
+
             var user = await _context.Users.FirstOrDefaultAsync(u =>
-                u.Email == dto.EmailOrUserName ||
-                u.UserName == dto.EmailOrUserName);
+                u.Email.ToLower() == login.ToLower() ||
+                u.UserName.ToLower() == login.ToLower());
 
             if (user == null)
                 return null;
@@ -95,12 +155,10 @@ namespace Wevo_Pay_Project.Services
             var result = _passwordHasher.VerifyHashedPassword(
                 user,
                 user.PasswordHash,
-                dto.Password);
+                password);
 
             if (result == PasswordVerificationResult.Failed)
-            {
                 return null;
-            }
 
             return user;
         }
@@ -131,5 +189,63 @@ namespace Wevo_Pay_Project.Services
             };
         }
 
+        public async Task UpdateProfileAsync(int userId, UpdateProfileDto dto)
+        {
+            var user = await _context.Users.FindAsync(userId)
+                ?? throw new Exception("User not found.");
+
+            dto.FullName = dto.FullName.Trim();
+            dto.Email = dto.Email.Trim();
+            dto.PhoneNumber = dto.PhoneNumber.Trim();
+
+            var emailTaken = await _context.Users
+                .AnyAsync(u => u.Email == dto.Email && u.Id != userId);
+
+            if (emailTaken)
+                throw new Exception("This email is already used by another account.");
+
+            var phoneTaken = await _context.Users
+                .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber && u.Id != userId);
+
+            if (phoneTaken)
+                throw new Exception("This phone number is already used by another account.");
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            var user = await _context.Users.FindAsync(userId)
+                ?? throw new Exception("User not found.");
+
+            var verify = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                dto.CurrentPassword);
+
+            if (verify == PasswordVerificationResult.Failed)
+                throw new Exception("Current password is incorrect.");
+
+            if (dto.NewPassword.Length < 6)
+                throw new Exception("New password must be at least 6 characters.");
+
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                throw new Exception("New password and confirmation do not match.");
+
+            var sameAsOld = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                dto.NewPassword);
+
+            if (sameAsOld != PasswordVerificationResult.Failed)
+                throw new Exception("New password must be different from your current password.");
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+            await _context.SaveChangesAsync();
+        }
     }
 }

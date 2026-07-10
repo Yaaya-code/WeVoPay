@@ -1,0 +1,211 @@
+@model Wevo_Pay_Project.DTOs.UserSettingsViewModel
+
+@{
+    ViewData["Title"] = "Settings";
+    var initial = !string.IsNullOrWhiteSpace(Model.Profile.FullName)
+        ? Model.Profile.FullName.Trim()[0].ToString().ToUpperInvariant()
+        : "U";
+}
+
+<div class="settings-page">
+
+    <div class="settings-header mb-4">
+        <div>
+            <span class="settings-eyebrow">
+                <i class="bi bi-gear"></i>
+                Account
+            </span>
+            <h1 class="settings-title">Settings</h1>
+            <p class="settings-subtitle mb-0">
+                Manage your profile and security for Wevo Pay.
+            </p>
+        </div>
+        <a asp-action="Profile" class="btn btn-outline-primary rounded-pill px-3">
+            <i class="bi bi-person me-1"></i>
+            View profile
+        </a>
+    </div>
+
+    @if (TempData["SettingsSuccess"] != null)
+    {
+        <div class="alert alert-success rounded-3 border-0 shadow-sm mb-3">
+            <i class="bi bi-check-circle me-1"></i>
+            @TempData["SettingsSuccess"]
+        </div>
+    }
+    @if (TempData["SettingsError"] != null)
+    {
+        <div class="alert alert-danger rounded-3 border-0 shadow-sm mb-3">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            @TempData["SettingsError"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="settings-side-card mb-3">
+                <div class="settings-side-avatar">@initial</div>
+                <h2 class="settings-side-name">@Model.Profile.FullName</h2>
+                <p class="settings-side-user mb-2">@@@Model.UserName</p>
+                @if (Model.IsVerified)
+                {
+                    <span class="status completed">Verified</span>
+                }
+                else
+                {
+                    <span class="status verified">Standard</span>
+                }
+                <ul class="settings-side-list mt-3 mb-0">
+                    <li>
+                        <span>Email</span>
+                        <strong>@Model.Profile.Email</strong>
+                    </li>
+                    <li>
+                        <span>Phone</span>
+                        <strong>@Model.Profile.PhoneNumber</strong>
+                    </li>
+                    <li>
+                        <span>Member since</span>
+                        <strong>@Model.CreatedAt.ToString("MMM yyyy")</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="settings-tip">
+                <div class="settings-tip-icon">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <div>
+                    <strong>Keep your account safe</strong>
+                    <p class="mb-0">
+                        Use a strong password and keep your phone number up to date for transfer updates.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="settings-card mb-4">
+                <div class="settings-card-head">
+                    <div class="settings-card-icon">
+                        <i class="bi bi-person-vcard"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-card-title">Profile details</h2>
+                        <p class="settings-card-sub mb-0">Update how we contact you</p>
+                    </div>
+                </div>
+
+                <form asp-action="UpdateProfile" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label settings-label">Username</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-at input-icon"></i>
+                            <input type="text"
+                                   class="form-control settings-input"
+                                   value="@Model.UserName"
+                                   readonly
+                                   disabled />
+                        </div>
+                        <div class="form-text">Username can't be changed (used in your referral link).</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Profile.FullName" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-person input-icon"></i>
+                            <input asp-for="Profile.FullName" class="form-control settings-input" />
+                        </div>
+                        <span asp-validation-for="Profile.FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Profile.Email" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input asp-for="Profile.Email" type="email" class="form-control settings-input" />
+                        </div>
+                        <span asp-validation-for="Profile.Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Profile.PhoneNumber" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-telephone input-icon"></i>
+                            <input asp-for="Profile.PhoneNumber" type="tel" class="form-control settings-input" />
+                        </div>
+                        <span asp-validation-for="Profile.PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary settings-btn">
+                        <i class="bi bi-check2 me-1"></i>
+                        Save profile
+                    </button>
+                </form>
+            </div>
+            <div class="settings-card">
+                <div class="settings-card-head">
+                    <div class="settings-card-icon settings-card-icon-orange">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-card-title">Change password</h2>
+                        <p class="settings-card-sub mb-0">Use a strong password you don't reuse elsewhere</p>
+                    </div>
+                </div>
+
+                <form asp-action="ChangePassword" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label asp-for="Password.CurrentPassword" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input asp-for="Password.CurrentPassword"
+                                   type="password"
+                                   class="form-control settings-input"
+                                   autocomplete="current-password" />
+                        </div>
+                        <span asp-validation-for="Password.CurrentPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password.NewPassword" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-shield-lock input-icon"></i>
+                            <input asp-for="Password.NewPassword"
+                                   type="password"
+                                   class="form-control settings-input"
+                                   autocomplete="new-password" />
+                        </div>
+                        <span asp-validation-for="Password.NewPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password.ConfirmNewPassword" class="form-label settings-label"></label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-shield-check input-icon"></i>
+                            <input asp-for="Password.ConfirmNewPassword"
+                                   type="password"
+                                   class="form-control settings-input"
+                                   autocomplete="new-password" />
+                        </div>
+                        <span asp-validation-for="Password.ConfirmNewPassword" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary settings-btn">
+                        <i class="bi bi-key me-1"></i>
+                        Update password
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

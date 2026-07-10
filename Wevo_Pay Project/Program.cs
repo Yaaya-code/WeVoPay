@@ -14,10 +14,10 @@ namespace Wevo_Pay_Project
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<AppDbContext>(option => 
-            option.UseSqlServer(builder.Configuration.GetConnectionString("conString")));
+            builder.Services.AddDbContext<AppDbContext>(option =>
+                option.UseSqlServer(builder.Configuration.GetConnectionString("conString")));
+
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITransferService, TransferService>();
@@ -25,42 +25,51 @@ namespace Wevo_Pay_Project
             builder.Services.AddScoped<ISystemSettingService, SystemSettingService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
-
+            builder.Services.AddScoped<IMessageService, MessageService>();
+            builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddHttpClient("ExchangeRates", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(15);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("WevoPay/1.0");
+            });
+            builder.Services.AddHostedService<TransferExpiryBackgroundService>();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.LogoutPath = "/Account/Logout";
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.LogoutPath = "/Account/Logout";
+                    options.ExpireTimeSpan = TimeSpan.FromDays(2);
+                    options.SlidingExpiration = true;
+                });
 
-        options.ExpireTimeSpan = TimeSpan.FromDays(2);
-        options.SlidingExpiration = true;
-    });
             builder.Services.AddAuthorization();
-
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            using (var scope = app.Services.CreateScope())
+            {
+                DbSeeder.SeedAdminAsync(app.Services).GetAwaiter().GetResult();
+            }
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Account}/{action=Login}/{id?}")
-            .WithStaticAssets();
+                name: "default",
+                pattern: "{controller=Account}/{action=Login}/{id?}")
+                .WithStaticAssets();
 
             app.Run();
         }

@@ -1,4 +1,4 @@
-﻿namespace Wevo_Pay_Project.Enums
+namespace Wevo_Pay_Project.Enums
 {
     public enum TransferStatus
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wevo_Pay_Project.Data;
 using Wevo_Pay_Project.Models;
 using Wevo_Pay_Project.Services.Interfaces;

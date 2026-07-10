@@ -54,6 +54,45 @@ namespace Wevo_Pay_Project.Migrations
                     b.ToTable("CompanyWallets");
                 });
 
+            modelBuilder.Entity("Wevo_Pay_Project.Models.SupportMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("IsRead", "IsFromAdmin");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("SupportMessages");
+                });
+
             modelBuilder.Entity("Wevo_Pay_Project.Models.SystemSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -237,6 +276,9 @@ namespace Wevo_Pay_Project.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int?>("ReferredByUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -254,10 +296,31 @@ namespace Wevo_Pay_Project.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
+                    b.HasIndex("ReferredByUserId");
+
                     b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Wevo_Pay_Project.Models.SupportMessage", b =>
+                {
+                    b.HasOne("Wevo_Pay_Project.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Wevo_Pay_Project.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Wevo_Pay_Project.Models.Transaction", b =>
@@ -309,6 +372,16 @@ namespace Wevo_Pay_Project.Migrations
                     b.Navigation("User");
 
                     b.Navigation("VerifiedByAdmin");
+                });
+
+            modelBuilder.Entity("Wevo_Pay_Project.Models.User", b =>
+                {
+                    b.HasOne("Wevo_Pay_Project.Models.User", "ReferredByUser")
+                        .WithMany()
+                        .HasForeignKey("ReferredByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ReferredByUser");
                 });
 
             modelBuilder.Entity("Wevo_Pay_Project.Models.CompanyWallet", b =>

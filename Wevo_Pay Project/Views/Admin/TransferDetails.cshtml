@@ -1,10 +1,9 @@
-﻿@model Wevo_Pay_Project.Models.TransferRequest
+@model Wevo_Pay_Project.Models.TransferRequest
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Transfer Details";
 }
-
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -20,26 +19,20 @@
 
 </div>
 
-
-
 <div class="card shadow-sm border-0 rounded-4">
 
     <div class="card-body">
-
 
         <h5 class="fw-bold mb-3">
             Transfer Information
         </h5>
 
-
         <table class="table table-bordered">
-
 
             <tr>
                 <th>Transfer ID</th>
                 <td>#@Model.Id</td>
             </tr>
-
 
             <tr>
                 <th>Status</th>
@@ -73,14 +66,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>Amount</th>
                 <td>
                     @Model.TransferAmount.ToString("N2") EGP
                 </td>
             </tr>
-
 
             <tr>
                 <th>Fee</th>
@@ -89,14 +80,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>Total Amount</th>
                 <td>
                     @Model.TotalAmount.ToString("N2") EGP
                 </td>
             </tr>
-
 
             <tr>
                 <th>Wallet</th>
@@ -107,14 +96,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>InstaPay Address</th>
                 <td>
                     @Model.InstaPayAddress
                 </td>
             </tr>
-
 
             <tr>
                 <th>Notes</th>
@@ -123,14 +110,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>Created At</th>
                 <td>
                     @Model.CreatedAt
                 </td>
             </tr>
-
 
             <tr>
                 <th>Verified At</th>
@@ -139,14 +124,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>Completed At</th>
                 <td>
                     @(Model.CompletedAt?.ToString() ?? "-")
                 </td>
             </tr>
-
 
             <tr>
                 <th>Rejected At</th>
@@ -155,21 +138,15 @@
                 </td>
             </tr>
 
-
         </table>
 
-
-
         <hr />
-
 
         <h5 class="fw-bold mb-3">
             User Information
         </h5>
 
-
         <table class="table table-bordered">
-
 
             <tr>
                 <th>Name</th>
@@ -178,14 +155,12 @@
                 </td>
             </tr>
 
-
             <tr>
                 <th>Email</th>
                 <td>
                     @Model.User?.Email
                 </td>
             </tr>
-
 
             <tr>
                 <th>Phone</th>
@@ -194,10 +169,7 @@
                 </td>
             </tr>
 
-
         </table>
-
-
 
         <a asp-controller="Admin"
                asp-action="PendingTransfers"
@@ -207,7 +179,6 @@
             Back
 
         </a>
-
 
     </div>
 

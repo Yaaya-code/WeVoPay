@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Wevo_Pay_Project.Enums;
 
@@ -38,7 +38,7 @@ namespace Wevo_Pay_Project.Models
         [MaxLength(250)]
         public string? Notes { get; set; }
 
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; }
 
         public DateTime? VerifiedAt { get; set; }
 

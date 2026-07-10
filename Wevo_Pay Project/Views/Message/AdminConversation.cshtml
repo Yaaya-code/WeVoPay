@@ -1,0 +1,102 @@
+@model Wevo_Pay_Project.DTOs.ConversationViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"Chat - {Model.UserFullName}";
+}
+
+<div class="mb-3">
+    <a asp-action="AdminIndex" class="text-decoration-none">
+        Back to conversations
+    </a>
+</div>
+
+@if (TempData["MessageSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["MessageSuccess"]</div>
+}
+@if (TempData["MessageError"] != null)
+{
+    <div class="alert alert-danger">@TempData["MessageError"]</div>
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                 style="width:48px;height:48px;">
+                @Model.UserFullName.Substring(0, 1).ToUpper()
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">@Model.UserFullName</h4>
+                <div class="text-muted small">@@@Model.UserName - @Model.Email</div>
+            </div>
+        </div>
+        <span class="badge text-bg-light border">User ID #@Model.UserId</span>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="p-3 bg-light border-bottom">
+            <strong>Conversation</strong>
+            <span class="text-muted small ms-2">@Model.Messages.Count message(s)</span>
+        </div>
+
+        <div class="p-3" style="max-height: 420px; overflow-y: auto;" id="adminMsgThread">
+            @if (Model.Messages == null || !Model.Messages.Any())
+            {
+                <div class="text-center text-muted py-5">
+                    No messages yet. Send the first reply below.
+                </div>
+            }
+            else
+            {
+                @foreach (var msg in Model.Messages)
+                {
+                    var isAdmin = msg.IsFromAdmin;
+                    <div class="d-flex mb-3 @(isAdmin ? "justify-content-end" : "justify-content-start")">
+                        <div class="rounded-3 px-3 py-2 @(isAdmin ? "bg-primary text-white" : "bg-light border")"
+                             style="max-width: 75%;">
+                            <div class="small mb-1 @(isAdmin ? "text-white-50" : "text-muted")">
+                                @(isAdmin ? "You (Admin)" : Model.UserFullName)
+                                - @msg.CreatedAt.ToLocalTime().ToString("dd MMM, HH:mm")
+                            </div>
+                            <div style="white-space: pre-wrap;">@msg.Body</div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="p-3 border-top">
+            <form asp-action="AdminReply" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Reply.TargetUserId" value="@Model.UserId" />
+                <div class="mb-2">
+                    <textarea asp-for="Reply.Body"
+                              class="form-control"
+                              rows="3"
+                              maxlength="2000"
+                              placeholder="Write a reply to @Model.UserFullName..."
+                              required></textarea>
+                    <span asp-validation-for="Reply.Body" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i>
+                    Send reply
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var thread = document.getElementById('adminMsgThread');
+            if (thread) thread.scrollTop = thread.scrollHeight;
+        })();
+    </script>
+}

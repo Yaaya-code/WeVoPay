@@ -1,0 +1,101 @@
+@model List<Wevo_Pay_Project.DTOs.ConversationListItemDto>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Message Center";
+    string search = ViewBag.Search as string ?? string.Empty;
+    int totalUnread = ViewBag.TotalUnread is int u ? u : 0;
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Message Center</h2>
+        <p class="text-muted mb-0">
+            Conversations with users
+            @if (totalUnread > 0)
+            {
+                <span class="badge text-bg-danger ms-1">@totalUnread unread</span>
+            }
+        </p>
+    </div>
+</div>
+
+@if (TempData["MessageSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["MessageSuccess"]</div>
+}
+@if (TempData["MessageError"] != null)
+{
+    <div class="alert alert-danger">@TempData["MessageError"]</div>
+}
+
+<form method="get" asp-action="AdminIndex" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-8">
+                <label class="form-label small text-muted">Search</label>
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Name, username, email, or message text..." />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+            <div class="col-md-2">
+                <a asp-action="AdminIndex" class="btn btn-outline-secondary w-100">Reset</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var item in Model)
+                {
+                    <a asp-action="AdminConversation"
+                       asp-route-userId="@item.UserId"
+                       class="list-group-item list-group-item-action px-4 py-3">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div class="d-flex gap-3">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                                     style="width:44px;height:44px;flex-shrink:0;">
+                                    @item.UserFullName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">
+                                        @item.UserFullName
+                                        <span class="text-muted fw-normal">@@@item.UserName</span>
+                                        @if (item.UnreadCount > 0)
+                                        {
+                                            <span class="badge text-bg-danger ms-1">@item.UnreadCount new</span>
+                                        }
+                                    </div>
+                                    <div class="small text-muted mb-1">@item.Email</div>
+                                    <div class="small @(item.UnreadCount > 0 ? "fw-semibold" : "text-muted")">
+                                        @(item.LastMessageFromAdmin ? "You: " : "")@item.LastMessagePreview
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end small text-muted text-nowrap">
+                                @item.LastMessageAt.ToLocalTime().ToString("dd MMM")
+                                <div>@item.LastMessageAt.ToLocalTime().ToString("HH:mm")</div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                <p class="mb-0">No conversations yet. Users will appear here when they message support.</p>
+            </div>
+        }
+    </div>
+</div>

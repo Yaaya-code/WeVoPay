@@ -1,0 +1,290 @@
+@model Wevo_Pay_Project.DTOs.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+
+    var displayName = string.IsNullOrWhiteSpace(Model.FullName) ? Model.UserName : Model.FullName;
+    var initial = !string.IsNullOrWhiteSpace(displayName)
+        ? displayName.Trim()[0].ToString().ToUpperInvariant()
+        : "U";
+
+    var memberSince = Model.CreatedAt.ToString("MMMM yyyy");
+    var referralLink = Url.Action("Register", "Account", new { refCode = Model.UserName }, Context.Request.Scheme)
+                      ?? $"/Account/Register?refCode={Model.UserName}";
+}
+
+<div class="profile-page">
+    <section class="profile-hero mb-4">
+        <div class="profile-hero-main">
+            <div class="profile-avatar" aria-hidden="true">@initial</div>
+            <div>
+                <span class="profile-eyebrow">
+                    <i class="bi bi-person-circle"></i>
+                    Your account
+                </span>
+                <h1 class="profile-title">@displayName</h1>
+                <p class="profile-subtitle mb-2">
+                    @@@Model.UserName
+                    <span class="profile-dot">-</span>
+                    Member since @memberSince
+                </p>
+                @if (Model.IsVerified)
+                {
+                    <span class="profile-badge profile-badge-success">
+                        <i class="bi bi-shield-check"></i>
+                        Verified account
+                    </span>
+                }
+                else
+                {
+                    <span class="profile-badge profile-badge-muted">
+                        <i class="bi bi-shield"></i>
+                        Standard account
+                    </span>
+                }
+            </div>
+        </div>
+        <div class="profile-hero-actions">
+            <a asp-controller="Transfer" asp-action="Create" class="btn btn-light profile-hero-btn">
+                <i class="bi bi-plus-circle me-1"></i>
+                New Transfer
+            </a>
+            <a asp-controller="Transfer" asp-action="MyTransfers" class="btn btn-outline-light profile-hero-btn">
+                <i class="bi bi-clock-history me-1"></i>
+                My Transfers
+            </a>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="profile-card h-100">
+                <div class="profile-card-head">
+                    <div class="profile-card-icon">
+                        <i class="bi bi-person-vcard"></i>
+                    </div>
+                    <div>
+                        <h2 class="profile-card-title">Account details</h2>
+                        <p class="profile-card-sub mb-0">Your personal information on Wevo Pay</p>
+                    </div>
+                </div>
+
+                <div class="profile-fields">
+                    <div class="profile-field">
+                        <span class="profile-field-label">
+                            <i class="bi bi-person"></i>
+                            Full name
+                        </span>
+                        <span class="profile-field-value">@Model.FullName</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">
+                            <i class="bi bi-at"></i>
+                            Username
+                        </span>
+                        <span class="profile-field-value">@Model.UserName</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">
+                            <i class="bi bi-envelope"></i>
+                            Email
+                        </span>
+                        <span class="profile-field-value">@Model.Email</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">
+                            <i class="bi bi-telephone"></i>
+                            Phone
+                        </span>
+                        <span class="profile-field-value">
+                            @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "-" : Model.PhoneNumber)
+                        </span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">
+                            <i class="bi bi-calendar3"></i>
+                            Joined
+                        </span>
+                        <span class="profile-field-value">@Model.CreatedAt.ToString("dd MMMM yyyy")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="profile-card h-100">
+                <div class="profile-card-head">
+                    <div class="profile-card-icon profile-card-icon-green">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <div>
+                        <h2 class="profile-card-title">Transfer activity</h2>
+                        <p class="profile-card-sub mb-0">Wallet -> InstaPay overview</p>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-icon bg-blue">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                        <div>
+                            <div class="profile-stat-num">@Model.TotalTransfers</div>
+                            <div class="profile-stat-label">Total transfers</div>
+                        </div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-icon bg-green">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="profile-stat-num">@Model.CompletedTransfers</div>
+                            <div class="profile-stat-label">Completed</div>
+                        </div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-icon bg-orange">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div>
+                            <div class="profile-stat-num">@Model.PendingTransfers</div>
+                            <div class="profile-stat-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a asp-controller="Transfer" asp-action="MyTransfers" class="profile-link-btn mt-3">
+                    View all transfers
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="profile-card h-100">
+                <h2 class="profile-card-title mb-3">Quick actions</h2>
+
+                <a asp-controller="Transfer" asp-action="Create" class="profile-action">
+                    <span class="profile-action-icon">
+                        <i class="bi bi-send"></i>
+                    </span>
+                    <span class="profile-action-body">
+                        <strong>Create transfer</strong>
+                        <small>Move money wallet -> InstaPay</small>
+                    </span>
+                    <i class="bi bi-chevron-right profile-action-chevron"></i>
+                </a>
+
+                <a asp-controller="Transfer" asp-action="MyTransfers" class="profile-action">
+                    <span class="profile-action-icon bg-soft-orange">
+                        <i class="bi bi-list-ul"></i>
+                    </span>
+                    <span class="profile-action-body">
+                        <strong>My transfers</strong>
+                        <small>Track status and history</small>
+                    </span>
+                    <i class="bi bi-chevron-right profile-action-chevron"></i>
+                </a>
+
+                <a asp-controller="User" asp-action="Dashboard" class="profile-action">
+                    <span class="profile-action-icon bg-soft-purple">
+                        <i class="bi bi-house-door"></i>
+                    </span>
+                    <span class="profile-action-body">
+                        <strong>Dashboard</strong>
+                        <small>Back to your overview</small>
+                    </span>
+                    <i class="bi bi-chevron-right profile-action-chevron"></i>
+                </a>
+
+                <a asp-controller="User" asp-action="Settings" class="profile-action">
+                    <span class="profile-action-icon" style="background:#f1f5f9;color:#475569;">
+                        <i class="bi bi-gear"></i>
+                    </span>
+                    <span class="profile-action-body">
+                        <strong>Settings</strong>
+                        <small>Profile &amp; password</small>
+                    </span>
+                    <i class="bi bi-chevron-right profile-action-chevron"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="profile-card profile-referral h-100">
+                <div class="profile-card-head">
+                    <div class="profile-card-icon profile-card-icon-purple">
+                        <i class="bi bi-gift"></i>
+                    </div>
+                    <div>
+                        <h2 class="profile-card-title">Share Wevo Pay</h2>
+                        <p class="profile-card-sub mb-0">
+                            Invite friends who need wallet -> InstaPay transfers
+                        </p>
+                    </div>
+                </div>
+
+                <label class="profile-field-label d-block mb-2">Your referral link</label>
+                <div class="profile-referral-row">
+                    <input type="text"
+                           class="form-control profile-referral-input"
+                           id="referralLink"
+                           value="@referralLink"
+                           readonly />
+                    <button type="button" class="btn btn-primary profile-copy-btn" id="copyReferralBtn">
+                        <i class="bi bi-clipboard me-1"></i>
+                        <span id="copyReferralLabel">Copy</span>
+                    </button>
+                </div>
+                <p class="profile-referral-hint mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Share this link so others can join Wevo Pay and bridge Egyptian wallets to InstaPay.
+                </p>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="profile-tip">
+                <div class="profile-tip-icon">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+                <div>
+                    <h3 class="profile-tip-title">Why Wevo Pay?</h3>
+                    <p class="profile-tip-text mb-0">
+                        Egyptian wallets like Vodafone Cash can't send money directly to InstaPay.
+                        Your Wevo Pay account lets you create secure, tracked transfers that bridge that gap.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const btn = document.getElementById('copyReferralBtn');
+            const input = document.getElementById('referralLink');
+            const label = document.getElementById('copyReferralLabel');
+
+            if (!btn || !input) return;
+
+            btn.addEventListener('click', async function () {
+                const text = input.value;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                    } else {
+                        input.select();
+                        document.execCommand('copy');
+                    }
+                    btn.classList.add('is-copied');
+                    if (label) label.textContent = 'Copied!';
+                    setTimeout(function () {
+                        btn.classList.remove('is-copied');
+                        if (label) label.textContent = 'Copy';
+                    }, 1800);
+                } catch (e) {
+                    input.select();
+                    if (label) label.textContent = 'Select & copy';
+                }
+            });
+        })();
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿using Wevo_Pay_Project.DTOs;
+using Wevo_Pay_Project.DTOs;
 using Wevo_Pay_Project.Models;
 
 namespace Wevo_Pay_Project.Services.Interfaces
@@ -20,5 +20,9 @@ namespace Wevo_Pay_Project.Services.Interfaces
         Task<bool> UserNameExistsAsync(string userName);
 
         Task<UserDashboardDto> GetDashboardAsync(int userId);
+
+        Task UpdateProfileAsync(int userId, UpdateProfileDto dto);
+
+        Task ChangePasswordAsync(int userId, ChangePasswordDto dto);
     }
 }

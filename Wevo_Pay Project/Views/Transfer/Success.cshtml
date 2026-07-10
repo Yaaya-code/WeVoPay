@@ -1,9 +1,8 @@
-﻿@model Wevo_Pay_Project.Models.TransferRequest
+@model Wevo_Pay_Project.Models.TransferRequest
 
 @{
     ViewData["Title"] = "Transfer Created";
 }
-
 
 <div class="row justify-content-center">
 
@@ -13,7 +12,6 @@
 
             <div class="card-body p-5">
 
-
                 <div class="mb-4">
 
                     <i class="bi bi-check-circle-fill text-success"
@@ -22,22 +20,30 @@
 
                 </div>
 
-
                 <h2 class="fw-bold">
                     Transfer Request Created!
                 </h2>
 
-
                 <p class="text-muted">
                     Your transfer request has been submitted successfully.
                 </p>
-
+                <div class="alert alert-warning border-0 rounded-3 text-start mt-3 mb-0">
+                    <div class="d-flex gap-2">
+                        <i class="bi bi-stopwatch fs-4"></i>
+                        <div>
+                            <strong>1-hour verification limit</strong>
+                            <p class="mb-0 small">
+                                An admin must verify this request within <strong>1 hour</strong>.
+                                If not, it will be <strong>cancelled automatically</strong>.
+                                Send the money to the company wallet as soon as possible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <hr />
 
-
                 <div class="text-start mt-4">
-
 
                     <div class="d-flex justify-content-between mb-3">
 
@@ -51,7 +57,6 @@
 
                     </div>
 
-
                     <div class="d-flex justify-content-between mb-3">
 
                         <span>
@@ -63,7 +68,6 @@
                         </strong>
 
                     </div>
-
 
                     <div class="d-flex justify-content-between mb-3">
 
@@ -77,7 +81,6 @@
 
                     </div>
 
-
                     <div class="d-flex justify-content-between mb-3">
 
                         <span>
@@ -89,7 +92,6 @@
                         </span>
 
                     </div>
-
 
                     <div class="d-flex justify-content-between">
 
@@ -103,12 +105,9 @@
 
                     </div>
 
-
                 </div>
 
-
                 <div class="mt-5">
-
 
                     <a asp-controller="User"
                            asp-action="Dashboard"
@@ -118,7 +117,6 @@
 
                     </a>
 
-
                     <a asp-controller="Transfer"
                            asp-action="MyTransfers"
                            class="btn btn-outline-secondary ms-2">
@@ -127,9 +125,7 @@
 
                     </a>
 
-
                 </div>
-
 
             </div>
 

@@ -1,0 +1,112 @@
+@model Wevo_Pay_Project.DTOs.ConversationViewModel
+
+@{
+    ViewData["Title"] = "Message Center";
+}
+
+<div class="msg-page">
+
+    <div class="msg-header mb-4">
+        <div>
+            <span class="msg-eyebrow">
+                <i class="bi bi-chat-dots"></i>
+                Support
+            </span>
+            <h1 class="msg-title">Message Center</h1>
+            <p class="msg-subtitle mb-0">
+                Chat with Wevo Pay admins about transfers, wallets, or InstaPay issues.
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["MessageSuccess"] != null)
+    {
+        <div class="alert alert-success rounded-3 mb-3">@TempData["MessageSuccess"]</div>
+    }
+    @if (TempData["MessageError"] != null)
+    {
+        <div class="alert alert-danger rounded-3 mb-3">@TempData["MessageError"]</div>
+    }
+
+    <div class="msg-shell">
+        <div class="msg-shell-top">
+            <div class="msg-shell-agent">
+                <span class="msg-avatar msg-avatar-admin">
+                    <i class="bi bi-headset"></i>
+                </span>
+                <div>
+                    <strong>Wevo Pay Support</strong>
+                    <small>Usually replies during business hours</small>
+                </div>
+            </div>
+            <span class="msg-online-dot">Online</span>
+        </div>
+
+        <div class="msg-thread" id="msgThread">
+            @if (Model.Messages == null || !Model.Messages.Any())
+            {
+                <div class="msg-empty">
+                    <div class="msg-empty-icon">
+                        <i class="bi bi-chat-heart"></i>
+                    </div>
+                    <h3>No messages yet</h3>
+                    <p>
+                        Ask us anything about Vodafone Cash, other Egyptian wallets, or InstaPay transfers.
+                    </p>
+                </div>
+            }
+            else
+            {
+                @foreach (var msg in Model.Messages)
+                {
+                    var isMine = !msg.IsFromAdmin;
+                    <div class="msg-row @(isMine ? "is-mine" : "is-theirs")">
+                        @if (!isMine)
+                        {
+                            <span class="msg-avatar msg-avatar-sm msg-avatar-admin">
+                                <i class="bi bi-headset"></i>
+                            </span>
+                        }
+                        <div class="msg-bubble">
+                            <div class="msg-bubble-meta">
+                                @(isMine ? "You" : "Support")
+                                <span>- @msg.CreatedAt.ToLocalTime().ToString("dd MMM, HH:mm")</span>
+                            </div>
+                            <div class="msg-bubble-body">@msg.Body</div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <form asp-action="Send" method="post" class="msg-composer" id="msgComposer">
+            @Html.AntiForgeryToken()
+            <div class="msg-composer-inner">
+                <textarea asp-for="Reply.Body"
+                          class="form-control msg-input"
+                          rows="2"
+                          maxlength="2000"
+                          placeholder="Type your message to support..."
+                          required></textarea>
+                <button type="submit" class="btn btn-primary msg-send-btn">
+                    <i class="bi bi-send-fill"></i>
+                    <span>Send</span>
+                </button>
+            </div>
+            <span asp-validation-for="Reply.Body" class="text-danger small"></span>
+            <div class="msg-composer-hint">Max 2000 characters - Be clear about transfer IDs if you have them</div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var thread = document.getElementById('msgThread');
+            if (thread) {
+                thread.scrollTop = thread.scrollHeight;
+            }
+        })();
+    </script>
+}

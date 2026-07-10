@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wevo_Pay_Project.Models;
 
 namespace Wevo_Pay_Project.Data
@@ -10,10 +10,11 @@ namespace Wevo_Pay_Project.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Transaction> Transactions { get; set; } 
+        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<TransferRequest> TransferRequests { get; set; }
         public DbSet<CompanyWallet> CompanyWallets { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
+        public DbSet<SupportMessage> SupportMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +46,12 @@ namespace Wevo_Pay_Project.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
                 .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ReferredByUser)
+                .WithMany()
+                .HasForeignKey(u => u.ReferredByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<TransferRequest>()
                 .HasOne(t => t.User)
@@ -98,11 +105,24 @@ namespace Wevo_Pay_Project.Data
                 .HasIndex(t => t.ReferenceNumber)
                 .IsUnique();
 
+            modelBuilder.Entity<SupportMessage>()
+                .HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<SupportMessage>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SupportMessage>()
+                .HasIndex(m => new { m.UserId, m.CreatedAt });
+
+            modelBuilder.Entity<SupportMessage>()
+                .HasIndex(m => new { m.IsRead, m.IsFromAdmin });
         }
-
-
-
 
     }
 }

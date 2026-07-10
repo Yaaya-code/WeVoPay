@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Wevo_Pay_Project.Models;
@@ -26,7 +26,6 @@ namespace Wevo_Pay_Project.Controllers
             _systemSettingService = systemSettingService;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
@@ -35,7 +34,6 @@ namespace Wevo_Pay_Project.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> PendingTransfers(
     string? search,
@@ -43,13 +41,11 @@ namespace Wevo_Pay_Project.Controllers
         {
             int pageSize = 10;
 
-
             var result = await _transferService.GetPendingTransfersAsync(
                 search,
                 page,
                 pageSize
             );
-
 
             ViewBag.Search = search;
 
@@ -60,10 +56,8 @@ namespace Wevo_Pay_Project.Controllers
                     result.TotalCount / (double)pageSize
                 );
 
-
             return View(result.Transfers);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -71,18 +65,13 @@ namespace Wevo_Pay_Project.Controllers
         {
             var adminId = GetAdminId();
 
-
             var result = await _transferService.VerifyTransferAsync(id, adminId);
-
 
             if (!result)
                 return NotFound();
 
-
             return RedirectToAction(nameof(PendingTransfers));
         }
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -90,13 +79,10 @@ namespace Wevo_Pay_Project.Controllers
         {
             var adminId = GetAdminId();
 
-
             var result = await _transferService.CompleteTransferAsync(id, adminId);
-
 
             if (!result)
                 return NotFound();
-
 
             return RedirectToAction(nameof(CompletedTransfers));
         }
@@ -107,13 +93,10 @@ namespace Wevo_Pay_Project.Controllers
         {
             var adminId = GetAdminId();
 
-
             var result = await _transferService.RejectTransferAsync(id, adminId);
-
 
             if (!result)
                 return NotFound();
-
 
             return RedirectToAction(nameof(PendingTransfers));
         }
@@ -132,13 +115,11 @@ namespace Wevo_Pay_Project.Controllers
         {
             int pageSize = 10;
 
-
             var result = await _transferService.GetVerifiedTransfersAsync(
                 search,
                 page,
                 pageSize
             );
-
 
             ViewBag.Search = search;
 
@@ -149,12 +130,8 @@ namespace Wevo_Pay_Project.Controllers
                     result.TotalCount / (double)pageSize
                 );
 
-
             return View(result.Transfers);
         }
-
-
-
 
         [HttpGet]
         public async Task<IActionResult> Settings()
@@ -185,7 +162,6 @@ namespace Wevo_Pay_Project.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RejectedTransfers(
                                                         string? search,
@@ -193,13 +169,11 @@ namespace Wevo_Pay_Project.Controllers
         {
             int pageSize = 10;
 
-
             var result = await _transferService.GetRejectedTransfersAsync(
                 search,
                 page,
                 pageSize
             );
-
 
             ViewBag.Search = search;
 
@@ -210,12 +184,8 @@ namespace Wevo_Pay_Project.Controllers
                     result.TotalCount / (double)pageSize
                 );
 
-
             return View(result.Transfers);
         }
-
-
-
 
         public async Task<IActionResult> CompletedTransfers(
             string? search,
@@ -223,13 +193,11 @@ namespace Wevo_Pay_Project.Controllers
         {
             int pageSize = 10;
 
-
             var result = await _transferService.GetCompletedTransfersAsync(
                 search,
                 page,
                 pageSize
             );
-
 
             ViewBag.Search = search;
 
@@ -239,7 +207,6 @@ namespace Wevo_Pay_Project.Controllers
                 (int)Math.Ceiling(
                     result.TotalCount / (double)pageSize
                 );
-
 
             return View(result.Transfers);
         }
@@ -253,8 +220,6 @@ namespace Wevo_Pay_Project.Controllers
 
             return View(transfer);
         }
-
-       
 
     }
 }

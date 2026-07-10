@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Wevo_Pay_Project.Models
 {
@@ -17,7 +17,7 @@ namespace Wevo_Pay_Project.Models
 
         public bool IsActive { get; set; } = true;
 
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; }
 
         public ICollection<TransferRequest> TransferRequests { get; set; }
             = new List<TransferRequest>();

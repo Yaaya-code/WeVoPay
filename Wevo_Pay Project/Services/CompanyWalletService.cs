@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wevo_Pay_Project.Data;
 using Wevo_Pay_Project.Models;
 using Wevo_Pay_Project.Services.Interfaces;
@@ -14,7 +14,6 @@ namespace Wevo_Pay_Project.Services
             _context = context;
         }
 
-
         public async Task<(List<CompanyWallet> Wallets, int TotalCount)> GetWalletsAsync(
     string? search,
     int page,
@@ -22,7 +21,6 @@ namespace Wevo_Pay_Project.Services
         {
             var query = _context.CompanyWallets
                 .AsQueryable();
-
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -33,9 +31,7 @@ namespace Wevo_Pay_Project.Services
                     w.WalletNumber.Contains(search));
             }
 
-
             var totalCount = await query.CountAsync();
-
 
             var wallets = await query
                 .OrderByDescending(w => w.CreatedAt)
@@ -43,17 +39,14 @@ namespace Wevo_Pay_Project.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-
             return (wallets, totalCount);
         }
-
 
         public async Task<CompanyWallet?> GetByIdAsync(int id)
         {
             return await _context.CompanyWallets
                 .FirstOrDefaultAsync(w => w.Id == id);
         }
-
 
         public async Task<CompanyWallet> CreateAsync(CompanyWallet wallet)
         {
@@ -75,7 +68,6 @@ namespace Wevo_Pay_Project.Services
             return wallet;
         }
 
-
         public async Task<bool> UpdateAsync(CompanyWallet wallet)
         {
             var existingWallet = await _context.CompanyWallets
@@ -94,16 +86,13 @@ namespace Wevo_Pay_Project.Services
             if (exists)
                 return false;
 
-
             existingWallet.WalletName = wallet.WalletName;
             existingWallet.WalletNumber = wallet.WalletNumber;
-
 
             await _context.SaveChangesAsync();
 
             return true;
         }
-
 
         public async Task<bool> ToggleStatusAsync(int id)
         {
@@ -112,7 +101,6 @@ namespace Wevo_Pay_Project.Services
 
             if (wallet == null)
                 return false;
-
 
             wallet.IsActive = !wallet.IsActive;
 
@@ -127,7 +115,6 @@ namespace Wevo_Pay_Project.Services
                 .OrderByDescending(w => w.CreatedAt)
                 .ToListAsync();
         }
-
 
     }
 }

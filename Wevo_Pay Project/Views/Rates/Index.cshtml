@@ -1,0 +1,134 @@
+@model Wevo_Pay_Project.DTOs.ExchangeRatesViewModel
+
+@{
+    ViewData["Title"] = "Exchange Rates";
+}
+
+<div class="rates-page">
+    <div class="rates-header mb-4">
+        <div>
+            <span class="rates-eyebrow">
+                <i class="bi bi-currency-exchange"></i>
+                Live market
+            </span>
+            <h1 class="rates-title">Currency &amp; Gold in EGP</h1>
+            <p class="rates-subtitle mb-0">
+                See how much USD, EUR, Gulf riyals, and other Arab currencies are worth in Egyptian pounds — plus gold prices.
+            </p>
+        </div>
+        @if (Model.Success)
+        {
+            <div class="rates-updated">
+                <i class="bi bi-clock-history"></i>
+                Updated @Model.UpdatedAtUtc.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+            </div>
+        }
+    </div>
+
+    @if (!Model.Success)
+    {
+        <div class="alert alert-warning rounded-3">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            @(Model.ErrorMessage ?? "Rates unavailable.")
+        </div>
+    }
+    else
+    {
+        @if (Model.Gold.Any())
+        {
+            <section class="mb-4">
+                <div class="rates-section-head">
+                    <h2 class="rates-section-title">
+                        <i class="bi bi-brightness-high text-warning"></i>
+                        Gold prices (EGP)
+                    </h2>
+                    @if (Model.GoldUsdPerOunce.HasValue)
+                    {
+                        <span class="rates-section-note">
+                            Spot ~ $@Model.GoldUsdPerOunce.Value.ToString("N2") / oz
+                        </span>
+                    }
+                </div>
+                <div class="row g-3">
+                    @foreach (var g in Model.Gold)
+                    {
+                        <div class="col-6 col-md-4 col-lg">
+                            <div class="rates-gold-card">
+                                <div class="rates-gold-label">@g.Label</div>
+                                <div class="rates-gold-price">
+                                    @g.PriceEgp.ToString("N2")
+                                    <small>EGP</small>
+                                </div>
+                                <div class="rates-gold-unit">@g.Unit</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+        else
+        {
+            <div class="alert alert-light border rounded-3 mb-4">
+                Gold price is temporarily unavailable. Currency rates below are still live.
+            </div>
+        }
+
+        <section>
+            <div class="rates-section-head">
+                <h2 class="rates-section-title">
+                    <i class="bi bi-cash-stack text-primary"></i>
+                    Currencies to EGP
+                </h2>
+                <span class="rates-section-note">1 unit of foreign currency = EGP</span>
+            </div>
+
+            <div class="rates-table-card">
+                <div class="table-responsive">
+                    <table class="table rates-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Currency</th>
+                                <th>Code</th>
+                                <th class="text-end">Value in EGP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.Currencies)
+                            {
+                                <tr class="@(c.Code == "EGP" ? "rates-row-base" : "")">
+                                    <td>
+                                        <div class="rates-currency-cell">
+                                            <span class="rates-flag">@c.Flag</span>
+                                            <span class="fw-semibold">@c.Name</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="rates-code">@c.Code</span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (c.IsAvailable)
+                                        {
+                                            <span class="rates-value">
+                                                @c.RateToEgp.ToString("N4")
+                                                <small>EGP</small>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <p class="rates-disclaimer mt-3 mb-0">
+                Rates are approximate and updated about every 30 minutes from public market sources.
+                They are for information only and may differ from bank or gold shop prices.
+            </p>
+        </section>
+    }
+</div>

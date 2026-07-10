@@ -1,85 +1,443 @@
-
+@model Wevo_Pay_Project.Models.TransferRequest
+@using Wevo_Pay_Project.Enums
 
 @{
     ViewData["Title"] = "Transfer Details";
+
+    var isPending = Model.Status == TransferStatus.Pending;
+    var isVerified = Model.Status == TransferStatus.Verified;
+    var isCompleted = Model.Status == TransferStatus.Completed;
+    var isRejected = Model.Status == TransferStatus.Rejected;
+    var isCancelled = Model.Status == TransferStatus.Cancelled;
+
+    var verifiedDone = isVerified || isCompleted;
+    var finalDone = isCompleted || isRejected || isCancelled;
+
+    string statusClass = Model.Status switch
+    {
+        TransferStatus.Pending => "pending",
+        TransferStatus.Verified => "verified",
+        TransferStatus.Completed => "completed",
+        _ => "rejected"
+    };
+
+    string statusMessage = Model.Status switch
+    {
+        TransferStatus.Pending => "Send the total amount to the company wallet, then wait for verification. You have 1 hour before this request is cancelled automatically.",
+        TransferStatus.Verified => "Payment received. Your InstaPay transfer is being processed.",
+        TransferStatus.Completed => "Funds have been sent to your InstaPay address.",
+        TransferStatus.Rejected => "This transfer was rejected. Contact support if you need help.",
+        TransferStatus.Cancelled => "This transfer was cancelled. Pending requests are cancelled automatically after 1 hour without admin verification.",
+        _ => "Track the progress of your wallet -> InstaPay request."
+    };
+
+    var createdUtc = Model.CreatedAt.Kind == DateTimeKind.Utc
+        ? Model.CreatedAt
+        : DateTime.SpecifyKind(Model.CreatedAt, DateTimeKind.Utc);
+    var expiresAtUtc = createdUtc.Add(Wevo_Pay_Project.Services.TransferService.PendingTimeout);
 }
 
-<h2>Transfer Details</h2>
+<div class="details-page">
+    <div class="details-header mb-4">
+        <div>
+            <a asp-action="MyTransfers" class="details-back">
+                <i class="bi bi-arrow-left"></i>
+                Back to My Transfers
+            </a>
+            <h1 class="details-title">Transfer Details</h1>
+            <p class="details-subtitle mb-0">
+                Request <strong>#@Model.Id</strong>
+                - Wallet -> InstaPay
+            </p>
+        </div>
+        <div class="details-header-right">
+            <span class="status @statusClass details-status-badge">@Model.Status</span>
+            <div class="details-total-block">
+                <span class="details-total-label">Total to send</span>
+                <div class="details-total-value">
+                    @Model.TotalAmount.ToString("N2")
+                    <small>EGP</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="details-banner details-banner-@statusClass mb-4">
+        <div class="details-banner-icon">
+            @if (isCompleted)
+            {
+                <i class="bi bi-check-circle-fill"></i>
+            }
+            else if (isRejected || isCancelled)
+            {
+                <i class="bi bi-x-circle-fill"></i>
+            }
+            else if (isVerified)
+            {
+                <i class="bi bi-patch-check-fill"></i>
+            }
+            else
+            {
+                <i class="bi bi-hourglass-split"></i>
+            }
+        </div>
+        <div>
+            <strong>@Model.Status</strong>
+            <p class="mb-0">@statusMessage</p>
+        </div>
+    </div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>Id</th>
-        <td>@Model.Id</td>
-    </tr>
+    @if (isPending)
+    {
+        <div class="details-timer mb-4"
+             id="transferTimer"
+             data-expires-utc="@expiresAtUtc.ToString("o")">
+            <div class="details-timer-icon">
+                <i class="bi bi-stopwatch"></i>
+            </div>
+            <div class="details-timer-body">
+                <strong>1-hour limit - time remaining</strong>
+                <p class="mb-1">
+                    Admin must verify this request within <strong>1 hour</strong> of creation.
+                    If not, it will be <strong>cancelled automatically</strong>.
+                </p>
+                <div class="details-timer-value" id="transferTimerValue">--:--:--</div>
+                <div class="details-timer-sub" id="transferTimerSub">Counting down...</div>
+            </div>
+        </div>
+    }
 
-    <tr>
-        <th>Wallet</th>
-        <td>@Model.CompanyWallet?.WalletName (@Model.CompanyWallet?.WalletNumber)</td>
-    </tr>
+    <div class="row g-4">
 
-    <tr>
-        <th>Amount</th>
-        <td>@Model.TransferAmount</td>
-    </tr>
+        <div class="col-lg-8">
+            <div class="details-card mb-4">
+                <h2 class="details-card-title">
+                    <i class="bi bi-signpost-split me-2 text-primary"></i>
+                    Status timeline
+                </h2>
 
-    <tr>
-        <th>Fee</th>
-        <td>@Model.Fee</td>
-    </tr>
+                <div class="details-timeline">
+                    @{
+                        var lineProgress = isCompleted ? "100%"
+                            : (isRejected || isCancelled) ? "100%"
+                            : verifiedDone ? "50%"
+                            : "0%";
+                        var lineFailed = isRejected || isCancelled;
+                    }
+
+                    <div class="details-timeline-track">
+                        <div class="details-timeline-line @(lineFailed ? "is-failed" : "")"
+                             style="width: @lineProgress;"></div>
                     </div>
-
-                    <!-- Step 2: Verified -->
-                    <div class="text-center" style="z-index: 2;">
-                        @if (Model.Status == Wevo_Pay_Project.Enums.TransferStatus.Verified ||
-                                                Model.Status == Wevo_Pay_Project.Enums.TransferStatus.Completed)
-                        {
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
-                                 style="width: 38px; height: 38px; background-color: var(--color-success); color: white;">
+                    <div class="details-step is-done">
+                        <div class="details-step-dot">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                        <div class="details-step-label">Created</div>
+                        <div class="details-step-date">@Model.CreatedAt.ToString("dd MMM yyyy")</div>
+                        <div class="details-step-time">@Model.CreatedAt.ToString("HH:mm")</div>
+                    </div>
+                    <div class="details-step @(verifiedDone ? "is-done" : (isPending ? "is-current" : "")) @(isRejected || isCancelled ? "is-skipped" : "")">
+                        <div class="details-step-dot">
+                            @if (verifiedDone)
+                            {
                                 <i class="bi bi-check-lg"></i>
-                            </div>
-                            <div style="font-size: 13px; color: var(--color-gray-700);">Verified</div>
+                            }
+                            else
+                            {
+                                <i class="bi bi-clock"></i>
+                            }
+                        </div>
+                        <div class="details-step-label">Verified</div>
+                        @if (Model.VerifiedAt.HasValue)
+                        {
+                            <div class="details-step-date">@Model.VerifiedAt.Value.ToString("dd MMM yyyy")</div>
+                            <div class="details-step-time">@Model.VerifiedAt.Value.ToString("HH:mm")</div>
                         }
                         else
                         {
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
-                                 style="width: 38px; height: 38px; background-color: var(--color-gray-200); color: var(--color-gray-500);">
-                                <i class="bi bi-clock"></i>
-                            </div>
-                            <div style="font-size: 13px; color: var(--color-gray-500);">Verified</div>
+                            <div class="details-step-date text-muted">Waiting...</div>
                         }
                     </div>
+                    <div class="details-step @(isCompleted ? "is-done" : "") @(isRejected || isCancelled ? "is-failed" : "") @(isVerified ? "is-current" : "")">
+                        <div class="details-step-dot">
+                            @if (isCompleted)
+                            {
+                                <i class="bi bi-check-lg"></i>
+                            }
+                            else if (isRejected || isCancelled)
+                            {
+                                <i class="bi bi-x-lg"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-clock"></i>
+                            }
+                        </div>
+                        <div class="details-step-label">
+                            @if (isRejected)
+                            {
+                                <text>Rejected</text>
+                            }
+                            else if (isCancelled)
+                            {
+                                <text>Cancelled</text>
+                            }
+                            else
+                            {
+                                <text>Completed</text>
+                            }
+                        </div>
+                        @if (isCompleted && Model.CompletedAt.HasValue)
+                        {
+                            <div class="details-step-date">@Model.CompletedAt.Value.ToString("dd MMM yyyy")</div>
+                            <div class="details-step-time">@Model.CompletedAt.Value.ToString("HH:mm")</div>
+                        }
+                        else if (isRejected && Model.RejectedAt.HasValue)
+                        {
+                            <div class="details-step-date">@Model.RejectedAt.Value.ToString("dd MMM yyyy")</div>
+                            <div class="details-step-time">@Model.RejectedAt.Value.ToString("HH:mm")</div>
+                        }
+                        else if (!finalDone)
+                        {
+                            <div class="details-step-date text-muted">Waiting...</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="details-info-card h-100">
+                        <div class="details-info-head">
+                            <span class="details-info-icon">
+                                <i class="bi bi-wallet2"></i>
+                            </span>
+                            <span>From (send to this wallet)</span>
+                        </div>
+                        <div class="details-info-value">
+                            @(Model.CompanyWallet?.WalletName ?? "Company wallet")
+                        </div>
+                        <div class="details-info-sub">
+                            <code>@(Model.CompanyWallet?.WalletNumber ?? "-")</code>
+                        </div>
+                        @if (isPending)
+                        {
+                            <p class="details-info-tip mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                Send <strong>@Model.TotalAmount.ToString("N2") EGP</strong> to this number.
+                            </p>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="details-info-card h-100">
+                        <div class="details-info-head">
+                            <span class="details-info-icon details-info-icon-green">
+                                <i class="bi bi-bank"></i>
+                            </span>
+                            <span>To (InstaPay)</span>
+                        </div>
+                        <div class="details-info-value details-break">
+                            @Model.InstaPayAddress
+                        </div>
+                        <div class="details-info-sub text-muted">
+                            Destination address
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="details-card mb-4">
+                <h2 class="details-card-title">
+                    <i class="bi bi-receipt me-2 text-primary"></i>
+                    Amount breakdown
+                </h2>
+                <div class="details-amount-grid">
+                    <div class="details-amount-item">
+                        <span>Transfer amount</span>
+                        <strong>@Model.TransferAmount.ToString("N2") EGP</strong>
+                    </div>
+                    <div class="details-amount-item">
+                        <span>Service fee (@Model.FeePercentage.ToString("0.##")%)</span>
+                        <strong>@Model.Fee.ToString("N2") EGP</strong>
+                    </div>
+                    <div class="details-amount-item details-amount-total">
+                        <span>Total</span>
+                        <strong>@Model.TotalAmount.ToString("N2") EGP</strong>
+                    </div>
+                </div>
+            </div>
 
+            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+            {
+                <div class="details-card mb-4">
+                    <h2 class="details-card-title">
+                        <i class="bi bi-sticky me-2 text-primary"></i>
+                        Notes
+                    </h2>
+                    <p class="details-notes mb-0">@Model.Notes</p>
+                </div>
+            }
+        </div>
+        <div class="col-lg-4">
+            <div class="details-card mb-3">
+                <h2 class="details-card-title">Summary</h2>
+                <ul class="details-summary-list">
+                    <li>
+                        <span>Transfer ID</span>
+                        <strong>#@Model.Id</strong>
+                    </li>
+                    <li>
+                        <span>Status</span>
+                        <span class="status @statusClass">@Model.Status</span>
+                    </li>
+                    <li>
+                        <span>Created</span>
+                        <strong>@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</strong>
+                    </li>
+                    @if (Model.VerifiedAt.HasValue)
+                    {
+                        <li>
+                            <span>Verified</span>
+                            <strong>@Model.VerifiedAt.Value.ToString("dd MMM yyyy, HH:mm")</strong>
+                        </li>
+                    }
+                    @if (Model.CompletedAt.HasValue)
+                    {
+                        <li>
+                            <span>Completed</span>
+                            <strong>@Model.CompletedAt.Value.ToString("dd MMM yyyy, HH:mm")</strong>
+                        </li>
+                    }
+                    @if (Model.RejectedAt.HasValue)
+                    {
+                        <li>
+                            <span>Rejected</span>
+                            <strong>@Model.RejectedAt.Value.ToString("dd MMM yyyy, HH:mm")</strong>
+                        </li>
+                    }
+                </ul>
+            </div>
 
-    <tr>
-        <th>Notes</th>
-        <td>@Model.Notes</td>
-    </tr>
+            @if (isPending)
+            {
+                <div class="details-next-card mb-3">
+                    <div class="details-next-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <h3 class="details-next-title">Next step</h3>
+                    <p class="details-next-text">
+                        Open your Egyptian wallet app and send
+                        <strong>@Model.TotalAmount.ToString("N2") EGP</strong>
+                        to
+                        <strong>@(Model.CompanyWallet?.WalletName ?? "the company wallet")</strong>
+                        <code>@(Model.CompanyWallet?.WalletNumber ?? "")</code>.
+                    </p>
+                    <p class="details-next-text mb-0">
+                        After verification, funds go to InstaPay. Remember: you have only
+                        <strong>1 hour</strong> total for admin verification.
+                    </p>
+                </div>
+            }
+            else if (isVerified)
+            {
+                <div class="details-next-card details-next-verified mb-3">
+                    <div class="details-next-icon">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h3 class="details-next-title">Almost there</h3>
+                    <p class="details-next-text mb-0">
+                        Your payment was verified. We're completing the InstaPay transfer to
+                        <strong>@Model.InstaPayAddress</strong>.
+                    </p>
+                </div>
+            }
+            else if (isCompleted)
+            {
+                <div class="details-next-card details-next-done mb-3">
+                    <div class="details-next-icon">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <h3 class="details-next-title">All done</h3>
+                    <p class="details-next-text mb-0">
+                        This transfer is complete. Check your InstaPay account for the funds.
+                    </p>
+                </div>
+            }
 
-    <tr>
-        <th>Status</th>
-        <td>@Model.Status</td>
-    </tr>
+            <div class="details-tip-card">
+                <div class="details-tip-icon">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+                <div>
+                    <h3 class="details-tip-title">Why this flow?</h3>
+                    <p class="details-tip-text mb-0">
+                        Egyptian wallets like Vodafone Cash can't send directly to InstaPay.
+                        Wevo Pay bridges them with a tracked, escrow-style process.
+                    </p>
+                </div>
+            </div>
 
-    <tr>
-        <th>Created At</th>
-        <td>@Model.CreatedAt</td>
-    </tr>
+            <div class="d-grid gap-2 mt-3">
+                <a asp-action="MyTransfers" class="btn btn-outline-primary details-action-btn">
+                    <i class="bi bi-list-ul me-1"></i>
+                    All transfers
+                </a>
+                <a asp-action="Create" class="btn btn-primary details-action-btn">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    New transfer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <tr>
-        <th>Verified At</th>
-        <td>@(Model.VerifiedAt?.ToString() ?? "-")</td>
-    </tr>
+@if (isPending)
+{
+    @section Scripts {
+        <script>
+            (function () {
+                var box = document.getElementById('transferTimer');
+                var valueEl = document.getElementById('transferTimerValue');
+                if (!box || !valueEl) return;
 
-    <tr>
-        <th>Completed At</th>
-        <td>@(Model.CompletedAt?.ToString() ?? "-")</td>
-    </tr>
+                var expires = new Date(box.getAttribute('data-expires-utc'));
 
-    <tr>
-        <th>Rejected At</th>
-        <td>@(Model.RejectedAt?.ToString() ?? "-")</td>
-    </tr>
+                function tick() {
+                    var now = new Date();
+                    var ms = expires - now;
 
-</table>
+                    var subEl = document.getElementById('transferTimerSub');
 
-<a asp-action="MyTransfers" class="btn btn-secondary">Back</a>
+                    if (ms <= 0) {
+                        box.classList.add('is-expired');
+                        valueEl.textContent = '00:00:00';
+                        if (subEl) subEl.textContent = 'Time is up - request is being cancelled...';
+                        setTimeout(function () { window.location.reload(); }, 1500);
+                        return;
+                    }
+
+                    var totalSec = Math.floor(ms / 1000);
+                    var h = Math.floor(totalSec / 3600);
+                    var m = Math.floor((totalSec % 3600) / 60);
+                    var s = totalSec % 60;
+
+                    valueEl.textContent =
+                        String(h).padStart(2, '0') + ':' +
+                        String(m).padStart(2, '0') + ':' +
+                        String(s).padStart(2, '0');
+
+                    if (subEl) {
+                        subEl.textContent = 'Cancel deadline: ' + expires.toLocaleString();
+                    }
+
+                    if (ms < 15 * 60 * 1000) {
+                        box.classList.add('is-urgent');
+                    }
+
+                    setTimeout(tick, 1000);
+                }
+
+                tick();
+            })();
+        </script>
+    }
+}

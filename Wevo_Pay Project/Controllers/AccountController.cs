@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +19,23 @@ namespace Wevo_Pay_Project.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register()
+        public IActionResult Register(string? refCode = null)
         {
-            return View();
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToDashboard();
+            }
+
+            var model = new RegisterDto();
+
+            var referral = refCode ?? Request.Query["ref"].ToString();
+            if (!string.IsNullOrWhiteSpace(referral))
+            {
+                model.WasReferred = true;
+                model.ReferralCode = referral.Trim();
+            }
+
+            return View(model);
         }
 
         [HttpPost]
@@ -48,6 +62,11 @@ namespace Wevo_Pay_Project.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToDashboard();
+            }
+
             return View();
         }
 
@@ -84,14 +103,8 @@ namespace Wevo_Pay_Project.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal);
 
-            if (user.Role == Enums.UserRole.Admin)
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            }
-
-            return RedirectToAction("Dashboard", "User");
+            return RedirectToDashboard(user.Role);
         }
-
 
         [Authorize]
         [HttpPost]
@@ -104,6 +117,17 @@ namespace Wevo_Pay_Project.Controllers
             return RedirectToAction("Login");
         }
 
+        private IActionResult RedirectToDashboard(Enums.UserRole? role = null)
+        {
+            var isAdmin = role == Enums.UserRole.Admin
+                || (role == null && User.IsInRole(Enums.UserRole.Admin.ToString()));
 
+            if (isAdmin)
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+
+            return RedirectToAction("Dashboard", "User");
+        }
     }
 }

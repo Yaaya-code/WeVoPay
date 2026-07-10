@@ -1,188 +1,340 @@
-﻿@model List<Wevo_Pay_Project.Models.TransferRequest>
+@model List<Wevo_Pay_Project.Models.TransferRequest>
+@using Wevo_Pay_Project.Enums
 
 @{
     ViewData["Title"] = "My Transfers";
+
+    string search = ViewBag.Search as string ?? string.Empty;
+    TransferStatus? currentStatus = ViewBag.Status as TransferStatus?;
+    int currentPage = ViewBag.Page is int p ? p : 1;
+    int totalPages = ViewBag.TotalPages is int tp ? tp : 1;
+    int totalCount = ViewBag.TotalCount is int tc ? tc : Model.Count;
+    bool hasFilters = !string.IsNullOrWhiteSpace(search) || currentStatus.HasValue;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 style="color: #0f172a; font-weight: 700; margin-bottom: 4px;">My Transfers</h2>
-        <p style="color: #64748b; margin-bottom: 0;">Track and manage all your transfer requests</p>
+<div class="transfers-page">
+    <div class="transfers-header mb-4">
+        <div>
+            <span class="transfers-eyebrow">
+                <i class="bi bi-clock-history"></i>
+                Transfer history
+            </span>
+            <h1 class="transfers-title">My Transfers</h1>
+            <p class="transfers-subtitle mb-0">
+                Track wallet -> InstaPay requests and check their status anytime.
+            </p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary transfers-new-btn">
+            <i class="bi bi-plus-circle me-2"></i>
+            New Transfer
+        </a>
     </div>
-    <a asp-action="Create" class="btn btn-primary px-4" 
-       style="background-color: #2563eb; border-color: #2563eb;">
-        <i class="bi bi-plus-circle me-2"></i> New Transfer
-    </a>
-
-</div>
-
-<form method="get" class="card shadow-sm border-0 mb-4">
-
-<form method="get" class="card border-0 shadow-sm mb-4" style="background-color: #ffffff;">
-    <div class="card-body">
+    <div class="transfers-chips mb-3">
+        <a asp-action="MyTransfers"
+           asp-route-search="@search"
+           class="transfers-chip @(currentStatus == null ? "is-active" : "")">
+            All
+        </a>
+        @foreach (var s in Enum.GetValues<TransferStatus>())
+        {
+            <a asp-action="MyTransfers"
+               asp-route-search="@search"
+               asp-route-status="@s"
+               class="transfers-chip @(currentStatus == s ? "is-active" : "")">
+                @s
+            </a>
+        }
+    </div>
+    <form method="get" asp-action="MyTransfers" class="transfers-filter mb-4">
         <div class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label small" style="color: #475569; font-weight: 500;">Search</label>
-                <input type="text" class="form-control" name="search" value="@ViewBag.Search"
-                       placeholder="Search by wallet or InstaPay address..." 
-                       style="border-color: #e2e8f0;">
+            <div class="col-md-6 col-lg-5">
+                <label class="form-label transfers-filter-label">Search</label>
+                <div class="input-icon-group">
+                    <i class="bi bi-search input-icon"></i>
+                    <input type="text"
+                           class="form-control transfers-filter-input"
+                           name="search"
+                           value="@search"
+                           placeholder="Wallet name or InstaPay address..." />
+                </div>
             </div>
-
-            <div class="col-md-3">
-                <label class="form-label small" style="color: #475569; font-weight: 500;">Status</label>
-                <select name="status" class="form-select" style="border-color: #e2e8f0;">
-                    <option value="">All Statuses</option>
-                    @foreach (var s in Enum.GetValues<Wevo_Pay_Project.Enums.TransferStatus>())
+            <div class="col-md-3 col-lg-3">
+                <label class="form-label transfers-filter-label">Status</label>
+                <select name="status" class="form-select transfers-filter-input">
+                    <option value="">All statuses</option>
+                    @foreach (var s in Enum.GetValues<TransferStatus>())
                     {
-                        <option value="@s" selected="@(ViewBag.Status != null && ViewBag.Status.Equals(s))">@s</option>
+                        if (currentStatus == s)
+                        {
+                            <option value="@s" selected>@s</option>
                         }
+                        else
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    }
                 </select>
-
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn w-100" 
-                        style="background-color: #2563eb; color: white; border: none;">
-                    <i class="bi bi-search me-1"></i> Search
+            <div class="col-6 col-md-3 col-lg-2">
+                <button type="submit" class="btn btn-primary w-100 transfers-filter-btn">
+                    <i class="bi bi-funnel me-1"></i>
+                    Filter
                 </button>
             </div>
-            <div class="col-md-2">
-                <a asp-action="MyTransfers" class="btn w-100" 
-                   style="background-color: #f1f5f9; color: #334155; border: 1px solid #e2e8f0;">
+            <div class="col-6 col-md-12 col-lg-2">
+                <a asp-action="MyTransfers" class="btn btn-light border w-100 transfers-filter-btn">
                     Reset
-
                 </a>
             </div>
         </div>
+    </form>
+
+    <div class="transfers-deadline-banner mb-3">
+        <i class="bi bi-stopwatch"></i>
+        <div>
+            <strong>Pending transfers expire in 1 hour</strong>
+            <span>
+                If an admin does not verify a pending request within 1 hour, it is cancelled automatically.
+            </span>
+        </div>
     </div>
-</form>
-<div class="card border-0 shadow-sm" style="background-color: #ffffff;">
-    <div class="card-body p-0">
-        @if (Model.Any())
+
+    <div class="transfers-meta mb-3">
+        <span>
+            @if (totalCount == 0)
+            {
+                <text>No results</text>
+            }
+            else if (totalCount == 1)
+            {
+                <text>1 transfer</text>
+            }
+            else
+            {
+                <text>@totalCount transfers</text>
+            }
+            @if (hasFilters)
+            {
+                <span class="text-muted">- filtered</span>
+            }
+        </span>
+        @if (totalPages > 1)
+        {
+            <span class="text-muted">Page @currentPage of @totalPages</span>
+        }
+    </div>
+    <div class="transfers-panel">
+        @if (Model != null && Model.Any())
         {
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead style="background-color: #f8fafc;">
-                <tr>
-                            <th class="ps-4" style="color: #475569; font-weight: 600;">Wallet</th>
-                            <th style="color: #475569; font-weight: 600;">Amount</th>
-                            <th style="color: #475569; font-weight: 600;">Fee</th>
-                            <th style="color: #475569; font-weight: 600;">Total</th>
-                            <th style="color: #475569; font-weight: 600;">Status</th>
-                            <th style="color: #475569; font-weight: 600;">Date</th>
-                            <th class="text-end pe-4" style="color: #475569; font-weight: 600;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                    @foreach (var item in Model)
-                    {
-                            <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td class="ps-4">
-                                    <span style="color: #1e293b; font-weight: 600;">@item.CompanyWallet.WalletName</span>
-                                </td>
-                            <td>
-                                    <span style="color: #1e293b; font-weight: 600;">@item.TransferAmount.ToString("N2")</span>
-                                    <span style="color: #64748b; font-size: 0.875rem;">EGP</span>
-                            </td>
-                            <td>
-                                    <span style="color: #64748b;">@item.Fee.ToString("N2") EGP</span>
-                            </td>
-                            <td>
-                                    <span style="color: #0f172a; font-weight: 700;">@item.TotalAmount.ToString("N2") EGP</span>
-                            </td>
-                            <td>
-
-                                @switch (item.Status)
-                                {
-                                    case Wevo_Pay_Project.Enums.TransferStatus.Pending:
-                                            <span class="badge px-3 py-2" style="background-color: #fef3c7; color: #92400e; font-weight: 500;">Pending</span>
-                                        break;
-                                    case Wevo_Pay_Project.Enums.TransferStatus.Verified:
-                                            <span class="badge px-3 py-2" style="background-color: #dbeafe; color: #1e40af; font-weight: 500;">Verified</span>
-                                        break;
-                                    case Wevo_Pay_Project.Enums.TransferStatus.Completed:
-                                            <span class="badge px-3 py-2" style="background-color: #dcfce7; color: #166534; font-weight: 500;">Completed</span>
-                                        break;
-                                    default:
-                                        <span class="badge bg-danger">Rejected</span>
-                                        break;
-                                }
-
-                            </td>
-
-                            <td>
-                                @item.CreatedAt.ToString("dd MMM yyyy")
-                            </td>
-
-                            <td>
-
-                                <a asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-outline-primary">
-
-                                    <i class="bi bi-eye"></i>
-
-                                    Details
-
-                                </a>
-
-                            </td>
-
+                <table class="table transfers-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Wallet</th>
+                            <th>InstaPay</th>
+                            <th>Amount</th>
+                            <th class="d-none d-md-table-cell">Fee</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="d-none d-lg-table-cell">Date</th>
+                            <th class="text-end pe-4"></th>
                         </tr>
-                    }
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var instaPay = item.InstaPayAddress ?? string.Empty;
+                            var instaPayShort = instaPay.Length > 22
+                                ? instaPay.Substring(0, 20) + "..."
+                                : instaPay;
+
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="transfers-wallet">
+                                        <span class="transfers-wallet-icon">
+                                            <i class="bi bi-wallet2"></i>
+                                        </span>
+                                        <div>
+                                            <div class="fw-semibold">
+                                                @(item.CompanyWallet?.WalletName ?? "Wallet")
+                                            </div>
+                                            <div class="transfers-wallet-sub d-lg-none text-muted">
+                                                @item.CreatedAt.ToString("dd MMM yyyy")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="transfers-instapay" title="@instaPay">
+                                        @(string.IsNullOrWhiteSpace(instaPayShort) ? "-" : instaPayShort)
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">@item.TransferAmount.ToString("N2")</span>
+                                    <span class="transfers-currency">EGP</span>
+                                </td>
+                                <td class="d-none d-md-table-cell text-muted">
+                                    @item.Fee.ToString("N2")
+                                    <span class="transfers-currency">EGP</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold transfers-total">@item.TotalAmount.ToString("N2")</span>
+                                    <span class="transfers-currency">EGP</span>
+                                </td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case TransferStatus.Pending:
+                                            {
+                                                var createdUtc = item.CreatedAt.Kind == DateTimeKind.Utc
+                                                    ? item.CreatedAt
+                                                    : DateTime.SpecifyKind(item.CreatedAt, DateTimeKind.Utc);
+                                                var expiresUtc = createdUtc.Add(Wevo_Pay_Project.Services.TransferService.PendingTimeout);
+                                                <span class="status pending">Pending</span>
+                                                <div class="transfers-countdown"
+                                                     data-expires-utc="@expiresUtc.ToString("o")">
+                                                    <i class="bi bi-stopwatch"></i>
+                                                    <span class="transfers-countdown-text">1h limit</span>
+                                                </div>
+                                            }
+                                            break;
+                                        case TransferStatus.Verified:
+                                            <span class="status verified">Verified</span>
+                                            break;
+                                        case TransferStatus.Completed:
+                                            <span class="status completed">Completed</span>
+                                            break;
+                                        case TransferStatus.Cancelled:
+                                            <span class="status rejected">Cancelled</span>
+                                            <div class="transfers-cancelled-note">May be auto-expired</div>
+                                            break;
+                                        default:
+                                            <span class="status rejected">Rejected</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="d-none d-lg-table-cell text-muted small">
+                                    @item.CreatedAt.ToString("dd MMM yyyy")
+                                    <div class="transfers-time">@item.CreatedAt.ToString("HH:mm")</div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm transfers-details-btn">
+                                        Details
+                                        <i class="bi bi-chevron-right ms-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="transfers-empty">
+                <div class="transfers-empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                @if (hasFilters)
+                {
+                    <h3 class="transfers-empty-title">No matching transfers</h3>
+                    <p class="transfers-empty-text">
+                        Try a different search or clear the filters.
+                    </p>
+                    <a asp-action="MyTransfers" class="btn btn-outline-primary px-4">
+                        Clear filters
+                    </a>
                 }
                 else
                 {
-                    <tr>
+                    <h3 class="transfers-empty-title">No transfers yet</h3>
+                    <p class="transfers-empty-text">
+                        Create your first wallet -> InstaPay transfer to get started.
+                    </p>
+                    <a asp-action="Create" class="btn btn-primary px-4">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        New Transfer
+                    </a>
+                }
+            </div>
+        }
+    </div>
+    @if (totalPages > 1 && Model != null && Model.Any())
+    {
+        <nav class="transfers-pagination mt-4" aria-label="Transfers pagination">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="MyTransfers"
+                       asp-route-search="@search"
+                       asp-route-status="@currentStatus"
+                       asp-route-page="@(currentPage - 1)">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
 
-                        <td colspan="7" class="text-center py-5">
-
-                            <i class="bi bi-inbox fs-1 text-muted"></i>
-
-                            <p class="mt-3 text-muted">
-
-                                No transfers found.
-
-                            </p>
-
-                        </td>
-
-                    </tr>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    @if (i == 1 || i == totalPages || Math.Abs(i - currentPage) <= 1)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="MyTransfers"
+                               asp-route-search="@search"
+                               asp-route-status="@currentStatus"
+                               asp-route-page="@i">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    else if (i == currentPage - 2 || i == currentPage + 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
                 }
 
-            </tbody>
-
-        </table>
-
-    </div>
-
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="MyTransfers"
+                       asp-route-search="@search"
+                       asp-route-status="@currentStatus"
+                       asp-route-page="@(currentPage + 1)">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
 
-@if (ViewBag.TotalPages > 1)
-{
-    <nav class="mt-4">
+@section Scripts {
+    <script>
+        (function () {
+            document.querySelectorAll('.transfers-countdown').forEach(function (el) {
+                var expires = new Date(el.getAttribute('data-expires-utc'));
+                var textEl = el.querySelector('.transfers-countdown-text');
+                if (!textEl) return;
 
-        <ul class="pagination justify-content-center">
-
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(ViewBag.Page == i ? "active" : "")">
-
-                    <a class="page-link"
-                           asp-action="MyTransfers"
-                           asp-route-page="@i"
-                           asp-route-search="@ViewBag.Search"
-                           asp-route-status="@ViewBag.Status">
-
-                        @i
-
-                    </a>
-
-                </li>
-            }
-
-        </ul>
-
-    </nav>
+                function tick() {
+                    var ms = expires - new Date();
+                    if (ms <= 0) {
+                        textEl.textContent = 'Expired';
+                        el.classList.add('is-expired');
+                        return;
+                    }
+                    var totalSec = Math.floor(ms / 1000);
+                    var m = Math.floor(totalSec / 60);
+                    var s = totalSec % 60;
+                    textEl.textContent = m + 'm ' + String(s).padStart(2, '0') + 's left';
+                    if (ms < 15 * 60 * 1000) el.classList.add('is-urgent');
+                    setTimeout(tick, 1000);
+                }
+                tick();
+            });
+        })();
+    </script>
 }

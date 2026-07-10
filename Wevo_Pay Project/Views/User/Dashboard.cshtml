@@ -1,283 +1,310 @@
-﻿@model Wevo_Pay_Project.DTOs.UserDashboardDto
+@model Wevo_Pay_Project.DTOs.UserDashboardDto
 
 @{
     ViewData["Title"] = "Dashboard";
+    var firstName = User.Identity?.Name?.Split(' ').FirstOrDefault() ?? "there";
 }
-
-<div class="hero">
-
-    <div class="row align-items-center">
-
-        <div class="col-lg-8">
-
-            <span class="badge bg-light text-primary px-3 py-2 mb-3">
-                Welcome to WevoPay
-            </span>
-
-            <h1 class="display-5 fw-bold mb-3">
-                Welcome Back,
-                @User.Identity?.Name 👋
-            </h1>
-
-            <p class="lead text-white-50 mb-4">
-                Send and manage your transfers securely with WevoPay.
-            </p>
-
-            <a asp-controller="Transfer"
-                   asp-action="Create"
-                   class="btn btn-light btn-lg px-4">
-
-                <i class="bi bi-plus-circle"></i>
-
-                New Transfer
-
-            </a>
-
+<section class="dash-hero mb-4">
+    <div class="dash-hero-content">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="dash-hero-badge">
+                    <i class="bi bi-wallet2"></i>
+                    Wevo Pay
+                </span>
+                <h1 class="dash-hero-title">
+                    Welcome back, @firstName
+                </h1>
+                <p class="dash-hero-text">
+                    Move money from <strong>Vodafone Cash</strong> and other Egyptian wallets
+                    to <strong>InstaPay</strong> - Wevo Pay bridges the gap with secure, tracked transfers.
+                </p>
+                <div class="dash-hero-actions">
+                    <a asp-controller="Transfer" asp-action="Create" class="btn btn-light btn-lg dash-btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        New Transfer
+                    </a>
+                    <a asp-controller="Transfer" asp-action="MyTransfers" class="btn btn-outline-light btn-lg dash-btn-ghost">
+                        <i class="bi bi-clock-history me-2"></i>
+                        My Transfers
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-flex justify-content-end">
+                <div class="dash-hero-visual" aria-hidden="true">
+                    <div class="dash-flow">
+                        <div class="dash-flow-item">
+                            <i class="bi bi-phone"></i>
+                            <span>Wallet</span>
+                        </div>
+                        <div class="dash-flow-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                        <div class="dash-flow-item dash-flow-center">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Wevo</span>
+                        </div>
+                        <div class="dash-flow-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                        <div class="dash-flow-item">
+                            <i class="bi bi-bank"></i>
+                            <span>InstaPay</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="col-lg-4 text-center">
-
-            <i class="bi bi-wallet2"
-               style="font-size:180px;color:white;opacity:.15;"></i>
-
-        </div>
-
     </div>
-
-</div>
-
-<div class="row mt-4 g-4">
-
-    <div class="col-lg-3 col-md-6">
-
+</section>
+<div class="row g-3 g-lg-4 mb-4">
+    <div class="col-6 col-lg-3">
         <div class="stats-card">
-
             <div class="stats-icon bg-orange">
-                <i class="bi bi-clock-history"></i>
+                <i class="bi bi-hourglass-split"></i>
             </div>
-
-            <div class="stats-title">
-                Pending
-            </div>
-
-            <div class="stats-number">
-                @Model.PendingTransfers
-            </div>
-
+            <div class="stats-title">Pending</div>
+            <div class="stats-number">@Model.PendingTransfers</div>
+            <div class="stats-hint">1 hour to verify or auto-cancel</div>
         </div>
-
     </div>
-
-    <div class="col-lg-3 col-md-6">
-
+    <div class="col-6 col-lg-3">
         <div class="stats-card">
-
             <div class="stats-icon bg-green">
                 <i class="bi bi-check-circle"></i>
             </div>
-
-            <div class="stats-title">
-                Completed
-            </div>
-
-            <div class="stats-number">
-                @Model.CompletedTransfers
-            </div>
-
+            <div class="stats-title">Completed</div>
+            <div class="stats-number">@Model.CompletedTransfers</div>
+            <div class="stats-hint">Successfully delivered</div>
         </div>
-
     </div>
-
-    <div class="col-lg-3 col-md-6">
-
+    <div class="col-6 col-lg-3">
         <div class="stats-card">
-
             <div class="stats-icon bg-blue">
                 <i class="bi bi-cash-stack"></i>
             </div>
-
-            <div class="stats-title">
-                Total Amount
-            </div>
-
-            <div class="stats-number">
-                @Model.TotalAmount.ToString("N2") EGP
-            </div>
-
+            <div class="stats-title">Total Amount</div>
+            <div class="stats-number stats-number-sm">@Model.TotalAmount.ToString("N0")</div>
+            <div class="stats-hint">EGP transferred</div>
         </div>
-
     </div>
-
-    <div class="col-lg-3 col-md-6">
-
+    <div class="col-6 col-lg-3">
         <div class="stats-card">
-
-            <div class="stats-icon bg-red">
+            <div class="stats-icon bg-purple">
                 <i class="bi bi-arrow-left-right"></i>
             </div>
-
-            <div class="stats-title">
-                Transfers
-            </div>
-
-            <div class="stats-number">
-                @Model.TotalTransfers
-            </div>
-
+            <div class="stats-title">Total Transfers</div>
+            <div class="stats-number">@Model.TotalTransfers</div>
+            <div class="stats-hint">All-time requests</div>
         </div>
-
     </div>
-
 </div>
-
-<div class="row mt-5">
-
+<section class="dash-steps mb-4">
+    <div class="dash-steps-header">
+        <h2 class="dash-section-title mb-1">How it works</h2>
+        <p class="dash-section-sub mb-0">Three steps - pending requests expire in 1 hour if not verified</p>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="dash-step-card">
+                <div class="dash-step-num">1</div>
+                <h3 class="dash-step-title">Create a transfer</h3>
+                <p class="dash-step-text">
+                    Choose a company wallet (e.g. Vodafone Cash) and enter the InstaPay destination.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dash-step-card">
+                <div class="dash-step-num">2</div>
+                <h3 class="dash-step-title">Send to our wallet</h3>
+                <p class="dash-step-text">
+                    Transfer the amount to the selected Egyptian wallet so we can process it securely.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dash-step-card">
+                <div class="dash-step-num">3</div>
+                <h3 class="dash-step-title">Receive on InstaPay</h3>
+                <p class="dash-step-text">
+                    Once verified, funds are sent to your InstaPay address - track status anytime.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="row g-4">
     <div class="col-lg-8">
-
-        <div class="wevo-card">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-
-                <h4 class="fw-bold">
-
-                    <i class="bi bi-clock-history"></i>
-
-                    Recent Transfers
-
-                </h4>
-
-                <a asp-controller="Transfer"
-                       asp-action="MyTransfers"
-                       class="btn btn-outline-primary">
-
-                    View All
-
+        <div class="dash-panel h-100">
+            <div class="dash-panel-header">
+                <div>
+                    <h2 class="dash-section-title mb-0">
+                        <i class="bi bi-clock-history me-2 text-primary"></i>
+                        Recent Transfers
+                    </h2>
+                    <p class="dash-section-sub mb-0">Your latest wallet -> InstaPay activity</p>
+                </div>
+                <a asp-controller="Transfer" asp-action="MyTransfers" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    View all
                 </a>
-
             </div>
 
-            <table class="table align-middle">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Wallet</th>
-
-                        <th>Amount</th>
-
-                        <th>Status</th>
-
-                        <th></th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @if (Model.RecentTransfers.Any())
-                    {
-                        @foreach (var item in Model.RecentTransfers)
-                        {
+            @if (Model.RecentTransfers != null && Model.RecentTransfers.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table dash-table align-middle mb-0">
+                        <thead>
                             <tr>
-
-                                <td>@item.CompanyWallet.WalletName</td>
-
-                                <td>@item.TransferAmount.ToString("N2") EGP</td>
-
-                                <td>
-
-                                    @switch (item.Status)
-                                    {
-                                        case Wevo_Pay_Project.Enums.TransferStatus.Pending:
-                                            <span class="badge bg-warning">Pending</span>
-                                            break;
-
-                                        case Wevo_Pay_Project.Enums.TransferStatus.Completed:
-                                            <span class="badge bg-success">Completed</span>
-                                            break;
-
-                                        case Wevo_Pay_Project.Enums.TransferStatus.Verified:
-                                            <span class="badge bg-info">Verified</span>
-                                            break;
-
-                                        default:
-                                            <span class="badge bg-danger">Rejected</span>
-                                            break;
-                                    }
-
-                                </td>
-
-                                <td>
-
-                                    <a asp-controller="Transfer"
+                                <th>Wallet</th>
+                                <th>InstaPay</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RecentTransfers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="dash-wallet-cell">
+                                            <span class="dash-wallet-icon">
+                                                <i class="bi bi-wallet2"></i>
+                                            </span>
+                                            <span class="fw-semibold">
+                                                @(item.CompanyWallet?.WalletName ?? "Wallet")
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small">
+                                        @(string.IsNullOrWhiteSpace(item.InstaPayAddress)
+                                            ? "-"
+                                            : (item.InstaPayAddress.Length > 18
+                                                ? item.InstaPayAddress.Substring(0, 16) + "..."
+                                                : item.InstaPayAddress))
+                                    </td>
+                                    <td class="fw-bold">
+                                        @item.TransferAmount.ToString("N2")
+                                        <span class="text-muted fw-normal small">EGP</span>
+                                    </td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case Wevo_Pay_Project.Enums.TransferStatus.Pending:
+                                                <span class="status pending">Pending</span>
+                                                break;
+                                            case Wevo_Pay_Project.Enums.TransferStatus.Verified:
+                                                <span class="status verified">Verified</span>
+                                                break;
+                                            case Wevo_Pay_Project.Enums.TransferStatus.Completed:
+                                                <span class="status completed">Completed</span>
+                                                break;
+                                            case Wevo_Pay_Project.Enums.TransferStatus.Cancelled:
+                                                <span class="status rejected">Cancelled</span>
+                                                break;
+                                            default:
+                                                <span class="status rejected">Rejected</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-muted small">
+                                        @item.CreatedAt.ToString("dd MMM yyyy")
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Transfer"
                                            asp-action="Details"
                                            asp-route-id="@item.Id"
-                                           class="btn btn-sm btn-outline-primary">
-
-                                        Details
-
-                                    </a>
-
-                                </td>
-
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="4" class="text-center py-5 text-muted">
-
-                                No transfers found.
-
-                            </td>
-
-                        </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
+                                           class="btn btn-sm btn-light border dash-details-btn">
+                                            Details
+                                            <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="dash-empty">
+                    <div class="dash-empty-icon">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h3 class="dash-empty-title">No transfers yet</h3>
+                    <p class="dash-empty-text">
+                        Start your first transfer from an Egyptian wallet to InstaPay.
+                    </p>
+                    <a asp-controller="Transfer" asp-action="Create" class="btn btn-primary px-4">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Create Transfer
+                    </a>
+                </div>
+            }
         </div>
-
     </div>
-
     <div class="col-lg-4">
+        <div class="dash-panel mb-4">
+            <h2 class="dash-section-title mb-3">Quick Actions</h2>
 
-        <div class="wevo-card">
-
-            <h4 class="fw-bold mb-4">
-
-                Quick Actions
-
-            </h4>
-
-            <a asp-controller="Transfer"
-                   asp-action="Create"
-                   class="btn btn-primary w-100 mb-3">
-
-                <i class="bi bi-send"></i>
-
-                Create Transfer
-
+            <a asp-controller="Transfer" asp-action="Create" class="dash-action-link dash-action-primary">
+                <span class="dash-action-icon">
+                    <i class="bi bi-send"></i>
+                </span>
+                <span class="dash-action-body">
+                    <strong>Create Transfer</strong>
+                    <small>Wallet -> InstaPay</small>
+                </span>
+                <i class="bi bi-chevron-right dash-action-chevron"></i>
             </a>
 
-            <a asp-controller="Transfer"
-                   asp-action="MyTransfers"
-                   class="btn btn-outline-primary w-100 mb-3">
-
-                <i class="bi bi-clock-history"></i>
-
-                My Transfers
-
+            <a asp-controller="Transfer" asp-action="MyTransfers" class="dash-action-link">
+                <span class="dash-action-icon bg-soft-orange">
+                    <i class="bi bi-list-ul"></i>
+                </span>
+                <span class="dash-action-body">
+                    <strong>My Transfers</strong>
+                    <small>Track all requests</small>
+                </span>
+                <i class="bi bi-chevron-right dash-action-chevron"></i>
             </a>
 
+            <a asp-controller="User" asp-action="Profile" class="dash-action-link">
+                <span class="dash-action-icon bg-soft-purple">
+                    <i class="bi bi-person"></i>
+                </span>
+                <span class="dash-action-body">
+                    <strong>My Profile</strong>
+                    <small>Account details</small>
+                </span>
+                <i class="bi bi-chevron-right dash-action-chevron"></i>
+            </a>
+
+            <a asp-controller="Message" asp-action="Index" class="dash-action-link">
+                <span class="dash-action-icon" style="background:#dbeafe;color:#2563eb;">
+                    <i class="bi bi-chat-dots"></i>
+                </span>
+                <span class="dash-action-body">
+                    <strong>Message Center</strong>
+                    <small>Chat with support</small>
+                </span>
+                <i class="bi bi-chevron-right dash-action-chevron"></i>
+            </a>
         </div>
 
+        <div class="dash-tip">
+            <div class="dash-tip-icon">
+                <i class="bi bi-lightbulb"></i>
+            </div>
+            <div>
+                <h3 class="dash-tip-title">Why Wevo Pay?</h3>
+                <p class="dash-tip-text mb-0">
+                    Egyptian wallets like Vodafone Cash can't send directly to InstaPay.
+                    Wevo Pay connects them with escrow-style, status-tracked transfers.
+                </p>
+            </div>
+        </div>
     </div>
-
 </div>
